@@ -1,13 +1,18 @@
+import logging
+import os
+
 from flask import Flask, render_template
-from sqlalchemy import create_engine
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
+# Configure sqlalchemy
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["SQLALCHEMY_DATABASE_URI"]
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+
 @app.route('/')
 def hello_world():
-    engine = create_engine("postgresql://achim:passw0rd@db/datenbank")
-
-    with engine.connect() as con:
-        print(con.info)
+    app.logger.info("greeting was requested")
 
     return render_template("greet.html")

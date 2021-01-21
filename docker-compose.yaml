@@ -16,8 +16,10 @@ services:
             context: .
             dockerfile: app.Dockerfile
         environment:
+            - FLASK_APP=/app/__main__.py
             - FLASK_ENV=development
             - FLASK_DEBUG=1
+            - SQLALCHEMY_DATABASE_URI=postgresql://achim:passw0rd@db/datenbank
         tty: true
         volumes:
             - ./app:/app
