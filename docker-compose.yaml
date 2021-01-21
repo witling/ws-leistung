@@ -1,0 +1,36 @@
+version: "3.4"
+
+services:
+    db:
+        build:
+            context: .
+            dockerfile: db.Dockerfile
+        environment:
+            - POSTGRES_USER=achim
+            - POSTGRES_PASSWORD=passw0rd
+            - POSTGRES_DB=datenbank
+
+    app:
+        restart: always
+        build:
+            context: .
+            dockerfile: app.Dockerfile
+        ports:
+            - "8080:5000"
+        environment:
+            - FLASK_ENV=development
+            - FLASK_DEBUG=1
+        tty: true
+        volumes:
+            - ./app:/app
+        depends_on:
+            - db
+
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - app
+        ports:
+            - "4000:4000"
