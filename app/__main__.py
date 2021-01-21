@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from sqlalchemy import create_engine
 
 app = Flask(__name__)
@@ -10,4 +10,4 @@ def hello_world():
     with engine.connect() as con:
         print(con.info)
 
-    return 'Hello, World!'
+    return render_template("greet.html")
