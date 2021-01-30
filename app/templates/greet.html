@@ -5,4 +5,11 @@
 {% block content %}
 <h1>Hello World!</h1>
 This ist the content of greet.html
+
+<ul>
+{% for user in users %}
+    - <li>{{ user.username }}</li>
+{% endfor %}
+</ul>
+
 {% endblock %}

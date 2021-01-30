@@ -18,15 +18,16 @@ db = SQLAlchemy(app)
 def hello_world():
     app.logger.info("greeting was requested")
 
-    db.drop_all()
-    db.create_all()
+    #db.drop_all()
+    #db.create_all()
 
     from .model import User
 
-    db.session.add(User(username="fred"))
-    db.session.add(User(username="jochen"))
-    db.session.commit()
+    #db.session.add(User(username="fred"))
+    #db.session.add(User(username="jochen"))
+    #db.session.commit()
 
-    app.logger.info(User.query.all())
+    users = User.query.all()
+    app.logger.info(users)
 
-    return render_template("greet.html")
+    return render_template("greet.html", users=users)
