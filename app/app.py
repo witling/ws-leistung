@@ -15,19 +15,19 @@ db = SQLAlchemy(app)
 
 
 @app.route('/')
-def hello_world():
+def index():
     app.logger.info("greeting was requested")
 
     #db.drop_all()
     #db.create_all()
 
-    from .model import User
+    from .model import Image
 
     #db.session.add(User(username="fred"))
     #db.session.add(User(username="jochen"))
     #db.session.commit()
 
-    users = User.query.all()
-    app.logger.info(users)
+    images = Image.query.all()
+    app.logger.info(images)
 
-    return render_template("greet.html", users=users)
+    return render_template("greet.html", images=images)

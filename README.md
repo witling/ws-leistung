@@ -3,7 +3,7 @@
 Start
 
 ``` bash
-docker-compose up --build
+docker-compose up --scale app=2 --build
 ```
 
 Service will be available at `localhost:4000`.
