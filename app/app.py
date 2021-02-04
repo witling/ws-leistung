@@ -32,6 +32,12 @@ def view_upload(method=["GET", "POST"]):
 
     app.logger.info("searching %s", query)
 
+    #if request.method == "POST":
+     #   if request.files:
+      #      f = request.files["image"]
+       #     f.save(secure_filename(f.filename))
+        #    item = Image()
+
     return render_template("upload.html")
 
 
