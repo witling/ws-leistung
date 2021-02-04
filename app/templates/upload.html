@@ -31,8 +31,9 @@
         </div>
     </div>
 </nav>
-<div class="mx-5">
-  <label for="formFile" class="form-label">Please choose an image to upload</label>
-  <input class="form-control" type="file" id="formFile">
-</div>
+<form class="mx-5" action="/upload" method="POST">
+    <label for="formFile" class="form-label">Please choose an image to upload</label>
+    <input class="form-control" type="file" id="formFile" name="formFile" accept="image/jpeg">
+    <button type="submit" class="btn btn-outline-primary my-3">Upload</button>
+</form>
 {% endblock %}
