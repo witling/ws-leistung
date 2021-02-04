@@ -2,15 +2,15 @@
 CREATE TABLE images (
     id CHAR(64),
     description VARCHAR(255),
-    added_date DATE,
-    content BYTEA,
+    added_date DATE NOT NULL,
+    content BYTEA NOT NULL,
 
     PRIMARY KEY(id)
 );
 
 CREATE TABLE thumbnails (
     id CHAR(64),
-    content BYTEA,
+    content BYTEA NOT NULL,
 
     PRIMARY KEY(id),
     CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
@@ -29,7 +29,7 @@ CREATE TABLE galleries (
     id SERIAL,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    added_date DATE,
+    added_date DATE NOT NULL,
 
     PRIMARY KEY(id)
 );
