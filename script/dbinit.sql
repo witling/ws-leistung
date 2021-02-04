@@ -1,6 +1,6 @@
 -- https://stackoverflow.com/a/10267699/13401153
 CREATE TABLE images (
-    id VARCHAR(32),
+    id CHAR(64),
     description VARCHAR(255),
     added_date DATE,
     content BYTEA,
@@ -9,7 +9,7 @@ CREATE TABLE images (
 );
 
 CREATE TABLE thumbnails (
-    id VARCHAR(32),
+    id CHAR(64),
     content BYTEA,
 
     PRIMARY KEY(id),
@@ -17,7 +17,7 @@ CREATE TABLE thumbnails (
 );
 
 CREATE TABLE metadata (
-    id VARCHAR(32),
+    id CHAR(64),
 
     -- TODO: which fields are metadata?
 
@@ -36,7 +36,7 @@ CREATE TABLE galleries (
 
 CREATE TABLE galleries_images (
     gallery_id INT,
-    image_id VARCHAR(32),
+    image_id CHAR(64),
 
     PRIMARY KEY(gallery_id, image_id),
     CONSTRAINT fk_gallery FOREIGN KEY(gallery_id) REFERENCES galleries(id),
