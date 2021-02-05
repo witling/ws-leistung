@@ -1,0 +1,29 @@
+{% macro image_card(image) %}
+    <a href="/image/{{ image.id }}">
+        <div class="card" style="width: 18rem;">
+            <img src="/api/image/{{ image.id }}?thumbnail=1" class="card-img-top" alt="{{ image.description }}">
+            <div class="card-body">
+                <p class="card-text">{{ image.description }}</p>
+            </div>
+        </div>
+    </a>
+{% endmacro %}
+
+{% macro render_pagination(pagination, endpoint, url_params="") %}
+    <nav aria-label="...">
+        <ul class="pagination pagination-sm">
+            {%- for page in pagination.iter_pages() %}
+
+                {% if page %}
+                  {% if page != pagination.page %}
+                  <li class="page-item"><a class="page-link" href="{{ url_for(endpoint, page=page) }}{% if url_params %}&{{ url_params }}{% endif %}">{{ page }}</a></li>
+                  {% else %}
+                    <li class="page-item active" aria-current="page"><span class="page-link">{{ page }}</span></li>
+                  {% endif %}
+                {% else %}
+                    <span class=ellipsis>…</span>
+                {% endif %}
+            {%- endfor %}
+        </ul>
+    </nav>
+{% endmacro %}

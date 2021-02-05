@@ -1,6 +1,18 @@
+{% from "macros.html" import image_card, render_pagination %}
+
 {% extends "base.html" %}
 
 {% block title %}Search{% endblock %}
 
 {% block content %}
+
+    <h2>Search results for "{{query}}" ...</h2>
+
+    {% for image in pagination.items %}
+        {{ image_card(image) }}
+    {% endfor %}
+
+    {% set url_params = "query=" ~ query %}
+    {{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
+
 {% endblock %}

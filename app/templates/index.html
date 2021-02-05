@@ -1,18 +1,15 @@
+{% from "macros.html" import image_card, render_pagination %}
+
 {% extends "base.html" %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
 
-{% for image in images %}
-    <a href="/image/{{ image.id }}">
-        <div class="card" style="width: 18rem;">
-            <img src="/api/image/{{ image.id }}?thumbnail=1" class="card-img-top" alt="{{ image.description }}">
-            <div class="card-body">
-                <p class="card-text">{{ image.description }}</p>
-            </div>
-        </div>
-    </a>
-{% endfor %}
+    {% for image in pagination.items %}
+        {{ image_card(image) }}
+    {% endfor %}
+
+    {{ render_pagination(pagination, request.endpoint) }}
 
 {% endblock %}

@@ -14,7 +14,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["SQLALCHEMY_DATABASE_URI"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
+
 THUMBNAIL_SIZE = (256, 256)
+IMAGES_PER_PAGE = 10
 
 
 def get_hash_value(img: bytes):
@@ -40,9 +42,9 @@ def create_thumbnail(img: bytes):
 def view_index():
     from .model import Image
 
-    images = Image.query.all()
+    pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
 
-    return render_template("index.html", images=images)
+    return render_template("index.html", pagination=pagination)
 
 
 @app.route('/upload', methods=["GET", "POST"])
@@ -83,13 +85,19 @@ def view_upload():
 
 @app.route('/search')
 def view_search():
+    from .model import Image
+
     query = request.args.get("query", None)
+    page = request.args.get("page", None)
+    if page:
+        page = int(page)
 
     app.logger.info("searching %s", query)
 
     # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
+    pagination = Image.query.filter(Image.description.match(query)).paginate(page=page, per_page=IMAGES_PER_PAGE)
 
-    return render_template("search.html")
+    return render_template("search.html", pagination=pagination, query=query)
 
 
 @app.route('/image/<string:image_id>')
