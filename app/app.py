@@ -87,6 +87,7 @@ def view_upload():
 def view_search():
     from .model import Image
 
+    # TODO: this fails if the query contains a whitespace
     query = request.args.get("query", None)
     page = request.args.get("page", None)
     if page:
@@ -119,6 +120,7 @@ def view_gallery(gallery_id=None):
     edit = request.args.get("edit", False)
 
     return render_template("gallery.html")
+
 
 @app.errorhandler(404)
 def view_404(e):
