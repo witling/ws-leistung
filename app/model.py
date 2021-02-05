@@ -11,8 +11,8 @@ class Image(db.Model):
     content = db.Column(db.LargeBinary)
 
     # one-to-one relationship
-    thumbnail = db.relationship('Thumbnail', backref='image', lazy=True, uselist=False)
-    meta = db.relationship('Metadata', backref='image', lazy=True, uselist=False)
+    thumbnail = db.relationship('Thumbnail', backref='image', lazy=True, uselist=False, cascade="all, delete")
+    meta = db.relationship('Metadata', backref='image', lazy=True, uselist=False, cascade="all, delete")
 
 
 class Thumbnail(db.Model):
