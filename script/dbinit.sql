@@ -3,6 +3,8 @@ CREATE TABLE images (
     id CHAR(64),
     description VARCHAR(255),
     added_date DATE NOT NULL,
+    height INT,
+    width INT,
     content BYTEA NOT NULL,
 
     PRIMARY KEY(id)
@@ -18,10 +20,10 @@ CREATE TABLE thumbnails (
 
 CREATE TABLE metadata (
     id CHAR(64),
+    key INT NOT NULL,
+    value VARCHAR(255) NOT NULL,
 
-    -- TODO: which fields are metadata?
-
-    PRIMARY KEY(id),
+    PRIMARY KEY(id, key),
     CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
 );
 

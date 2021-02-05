@@ -32,10 +32,16 @@ def create_thumbnail(img: bytes):
     with BytesIO() as output:
         image = Image.open(BytesIO(img))
 
+        app.logger.info(image.getexif())
+
         thumbnail = image.resize(THUMBNAIL_SIZE)
         thumbnail.save(output, format="jpeg")
 
         return output.getvalue()
+
+
+def is_image_allowed(pil_image):
+    return pil_image.format.lower() == "jpeg"
 
 
 @app.route('/')
@@ -50,34 +56,52 @@ def view_index():
 @app.route('/upload', methods=["GET", "POST"])
 def view_upload():
     from flask import flash
+    from io import BytesIO
+    from PIL import Image as PilImage
     from sqlalchemy.exc import IntegrityError
-    from .model import Image, Thumbnail
+
+    from .model import Image, Metadata, Thumbnail
 
     error = None
 
     if request.method == "POST":
         uploaded = request.files["formFile"]
-
-        # Check if uploaded image is jpeg using pillow
+        
         raw = uploaded.read()
         image_id = get_hash_value(raw)
 
-        image = Image()
-        image.id = image_id
-        image.description = request.form["description"]
-        image.content = raw
+        with BytesIO(raw) as raw_buffer:
+            pil_image = PilImage.open(raw_buffer)
 
-        image.thumbnail = Thumbnail()
-        image.thumbnail.content = create_thumbnail(raw)
+            # Check if uploaded image is jpeg using pillow
+            if not is_image_allowed(pil_image):
+                error = "Image does not have the appropriate format. Only jpeg is allowed."
+                return render_template("upload.html", error=error)
 
-        db.session.add(image)
+            # Add image to database 
+            image = Image()
+            image.id = image_id
+            image.height = image.height
+            image.width = image.width
+            image.description = request.form["description"]
+            image.content = raw
 
-        try:
-            db.session.commit()
-            flash("Image was successfully uploaded!")
+            # Generate thumbnail and add to database
+            image.thumbnail = Thumbnail()
+            image.thumbnail.content = create_thumbnail(raw)
 
-        except IntegrityError:
-            error = "We already have this image in our database."
+            # List exif metadata
+            for key, value in pil_image.getexif().items():
+                image.meta.append(Metadata(key=key, value=str(value)))
+
+            db.session.add(image)
+
+            try:
+                db.session.commit()
+                flash("Image was successfully uploaded!")
+
+            except IntegrityError:
+                error = "We already have this image in our database."
 
     return render_template("upload.html", error=error)
 

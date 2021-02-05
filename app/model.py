@@ -8,11 +8,13 @@ class Image(db.Model):
     id = db.Column(db.String(32), primary_key=True)
     description = db.Column(db.String(255))
     added_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    height = db.Column(db.Integer)
+    width = db.Column(db.Integer)
     content = db.Column(db.LargeBinary)
 
     # one-to-one relationship
     thumbnail = db.relationship('Thumbnail', backref='image', lazy=True, uselist=False, cascade="all, delete")
-    meta = db.relationship('Metadata', backref='image', lazy=True, uselist=False, cascade="all, delete")
+    meta = db.relationship('Metadata', backref='image', lazy=True, cascade="all, delete")
 
 
 class Thumbnail(db.Model):
@@ -30,6 +32,8 @@ class Metadata(db.Model):
     
     #id = db.relationship('Image', backref='image', lazy=True)
     id = db.Column(db.String(32), db.ForeignKey('images.id'), primary_key=True)
+    key = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.String(255))
 
 
 class Gallery(db.Model):
