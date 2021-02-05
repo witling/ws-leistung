@@ -112,6 +112,10 @@ def view_gallery(gallery_id=None):
 
     return render_template("gallery.html")
 
+@app.errorhandler(404)
+def view_404(e):
+    return render_template("404.html"), 404
+
 
 @app.route('/api/image/<string:image_id>')
 def api_image(image_id):
