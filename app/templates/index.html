@@ -6,9 +6,13 @@
 
 {% block content %}
 
-    {% for image in pagination.items %}
-        {{ image_card(image) }}
-    {% endfor %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for image in pagination.items %}
+            <div class="col">
+                {{ image_card(image) }}
+            </div>
+        {% endfor %}
+    </div>
 
     {{ render_pagination(pagination, request.endpoint) }}
 

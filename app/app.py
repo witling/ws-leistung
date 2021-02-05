@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 
 
 THUMBNAIL_SIZE = (256, 256)
-IMAGES_PER_PAGE = 10
+IMAGES_PER_PAGE = 9
 
 
 def get_hash_value(img: bytes):

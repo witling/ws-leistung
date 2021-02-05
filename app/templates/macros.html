@@ -1,12 +1,15 @@
 {% macro image_card(image) %}
-    <a href="/image/{{ image.id }}">
-        <div class="card" style="width: 18rem;">
+    <div class="card">
+        <a href="/image/{{ image.id }}">
             <img src="/api/image/{{ image.id }}?thumbnail=1" class="card-img-top" alt="{{ image.description }}">
-            <div class="card-body">
-                <p class="card-text">{{ image.description }}</p>
-            </div>
+        </a>
+        <div class="card-body">
+            <p class="card-text">{{ image.description }}</p>
         </div>
-    </a>
+        <div class="card-footer">
+            <small class="text-muted">Last updated 3 mins ago</small>
+        </div>
+    </div>
 {% endmacro %}
 
 {% macro render_pagination(pagination, endpoint, url_params="") %}

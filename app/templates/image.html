@@ -12,7 +12,7 @@
 
     <form class="mx-5" action="{{ url_for(request.endpoint, image_id=image.id) }}" method="POST">
 
-        <div class="container-fluid">
+        <div id="image-actions-bar" class="container-fluid">
             <a class="btn btn-primary" href="/api/image/{{ image.id }}?download=1">Download</a>
             <a class="btn btn-outline-primary" href="/api/image/{{ image.id }}?thumbnail=1&download=1">Download Thumbnail</a>
 
