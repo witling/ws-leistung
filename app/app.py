@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = b"89?_!30xc0vy03#+34+2+"
 
 # Configure custom jinja2 filters
-app.jinja_env.filters['dateformat'] = dateformat
+app.jinja_env.filters["dateformat"] = dateformat
 
 
 # Configure sqlalchemy
@@ -36,8 +36,6 @@ def create_thumbnail(img: bytes):
     with BytesIO() as output:
         image = Image.open(BytesIO(img))
 
-        app.logger.info(image.getexif())
-
         thumbnail = image.resize(THUMBNAIL_SIZE)
         thumbnail.save(output, format="jpeg")
 
@@ -48,7 +46,7 @@ def is_image_allowed(pil_image):
     return pil_image.format.lower() == "jpeg"
 
 
-@app.route('/')
+@app.route("/")
 def view_index():
     from .model import GalleryImage, Image
 
@@ -57,7 +55,7 @@ def view_index():
     return render_template("index.html", pagination=pagination)
 
 
-@app.route('/upload', methods=["GET", "POST"])
+@app.route("/upload", methods=["GET", "POST"])
 def view_upload():
     from flask import flash
     from io import BytesIO
@@ -68,6 +66,7 @@ def view_upload():
 
     error = None
 
+    # Upload was initiated
     if request.method == "POST":
         uploaded = request.files["formFile"]
         
@@ -110,7 +109,7 @@ def view_upload():
     return render_template("upload.html", error=error)
 
 
-@app.route('/search')
+@app.route("/search")
 def view_search():
     from .model import GalleryImage, Image
 
@@ -128,10 +127,11 @@ def view_search():
     return render_template("search.html", pagination=pagination, query=query)
 
 
-@app.route('/image/<string:image_id>', methods=["GET", "POST"])
+@app.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
     from .model import GalleryImage, Image
 
+    # Gallery was updated
     if request.method == "POST":
         error = None
 
@@ -154,8 +154,8 @@ def view_image(image_id):
     return render_template("image.html", image=image, edit=edit)
 
 
-@app.route('/gallery')
-@app.route('/gallery/<int:gallery_id>')
+@app.route("/gallery")
+@app.route("/gallery/<int:gallery_id>")
 def view_gallery(gallery_id=None):
     from .model import Gallery
 
@@ -169,25 +169,30 @@ def view_404(e):
     return render_template("404.html"), 404
 
 
-@app.route('/api/image/<string:image_id>')
+@app.route("/api/image/<string:image_id>")
 def api_image(image_id):
     from flask import Response
 
     from .model import GalleryImage, Image, Thumbnail
 
-    thumbnail = request.args.get('thumbnail', False)
-    download = request.args.get('download', False)
+    thumbnail = request.args.get("thumbnail", False)
+    download = request.args.get("download", False)
 
+    # Determine whether the thumbnail or the original image was requested
     if not thumbnail:
         image = Image.query.filter_by(id=image_id).first()
-        file_name = "{}.jpeg".format(image.id)
     else:
         image = Thumbnail.query.filter_by(id=image_id).first()
-        file_name = "{}_thumb.jpeg".format(image.id)
 
-    response = Response(image.content, mimetype='image/jpeg')
+    response = Response(image.content, mimetype="image/jpeg")
 
+    # If a download was requested, add `Content-Disposition` header
     if download:
+        if not thumbnail:
+            file_name = "{}.jpeg".format(image.id)
+        else:
+            file_name = "{}_thumb.jpeg".format(image.id)
+
         response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
 
     return response
