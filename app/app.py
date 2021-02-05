@@ -41,6 +41,8 @@ def view_search():
 
     app.logger.info("searching %s", query)
 
+    # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
+
     return render_template("search.html")
 
 
