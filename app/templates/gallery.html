@@ -1,7 +1,13 @@
+{% from "macros.html" import image_card, render_pagination %}
+
 {% extends "base.html" %}
 
 {% block title %}Gallery{% endblock %}
 
 {% block content %}
-<button type="button" class="btn btn-outline-primary m-auto">Create new gallery</button>
+
+    <button type="button" class="btn btn-outline-primary m-auto">Create new gallery</button>
+
+    {{ render_pagination(pagination, request.endpoint) }}
+
 {% endblock %}

@@ -3,6 +3,11 @@
     padding-right: 10px;
 }
 
+#paginator {
+    padding: 10px;
+    padding-top: 30px;
+}
+
 #image-actions-bar {
     padding: 10px;
 }

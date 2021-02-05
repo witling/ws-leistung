@@ -161,7 +161,9 @@ def view_gallery(gallery_id=None):
 
     edit = request.args.get("edit", False)
 
-    return render_template("gallery.html")
+    pagination = Gallery.query.paginate(per_page=IMAGES_PER_PAGE)
+
+    return render_template("gallery.html", pagination=pagination)
 
 
 @app.errorhandler(404)
