@@ -4,9 +4,13 @@ import os
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
+from .fmt import dateformat
 
 app = Flask(__name__)
 app.secret_key = b"89?_!30xc0vy03#+34+2+"
+
+# Configure custom jinja2 filters
+app.jinja_env.filters['dateformat'] = dateformat
 
 
 # Configure sqlalchemy
