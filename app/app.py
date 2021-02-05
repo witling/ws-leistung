@@ -56,6 +56,7 @@ def view_upload():
     if request.method == "POST":
         uploaded = request.files["formFile"]
 
+        # Check if uploaded image is jpeg using pillow
         raw = uploaded.read()
         image_id = get_hash_value(raw)
 
@@ -69,7 +70,6 @@ def view_upload():
         image.thumbnail.content = create_thumbnail(raw)
 
         db.session.add(image)
-
 
         try:
             db.session.commit()
