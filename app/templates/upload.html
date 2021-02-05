@@ -21,6 +21,13 @@
     <form class="mx-5" action="/upload" method="POST" enctype="multipart/form-data">
         <label for="formFile" class="form-label">Please choose an image to upload</label>
         <input class="form-control" type="file" id="formFile" name="formFile" accept="image/jpeg">
+
+        <div class="mb-3">
+            <label for="descriptionInput" class="form-label">Description</label>
+            <textarea class="form-control" id="descriptionInput" aria-describedby="name Help" name="description"></textarea>
+            <div id="descriptionHelp" class="form-text">Describe the pictures content.</div>
+        </div>
+
         <button type="submit" class="btn btn-outline-primary my-3">Upload</button>
     </form>
 

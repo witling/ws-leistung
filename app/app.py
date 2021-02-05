@@ -64,8 +64,7 @@ def view_upload():
 
         image = Image()
         image.id = image_id
-        image.name = uploaded.filename
-        image.description = 'Beschreibung'
+        image.description = request.form["description"]
         image.content = raw
 
         image.thumbnail = Thumbnail()
