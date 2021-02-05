@@ -27,3 +27,19 @@
         </ul>
     </nav>
 {% endmacro %}
+
+{% macro render_messages() %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+{% endmacro %}

@@ -1,22 +1,12 @@
+{% from "macros.html" import render_messages %}
+
 {% extends "base.html" %}
 
 {% block title %}Upload{% endblock %}
 
 {% block content %}
 
-    {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
-    {% endif %}
-
-    {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endwith %}
+    {{ render_messages() }}
 
     <form class="mx-5" action="/upload" method="POST" enctype="multipart/form-data">
         <label for="formFile" class="form-label">Please choose an image to upload</label>

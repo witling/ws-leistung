@@ -1,19 +1,43 @@
+{% from "macros.html" import render_messages %}
+
 {% extends "base.html" %}
 
 {% block title %}Image{% endblock %}
 
 {% block content %}
 
+    {{ render_messages() }}
+
     <img src="/api/image/{{ image.id }}" class="img-fluid d-block mx-auto" alt="{{ image.description }}">
 
-    <div class="container-fluid">
-        <a class="btn btn-primary" href="/api/image/{{ image.id }}?download=1">Download</a>
-        <a class="btn btn-outline-primary" href="/api/image/{{ image.id }}?thumbnail=1&download=1">Download Thumbnail</a>
-    </div>
+    <form class="mx-5" action="{{ url_for(request.endpoint, image_id=image.id) }}" method="POST">
 
-    <div class="container-fluid">
-        <p>{{ image.width }} x {{ image.height }}</p>
-        <p>{{ image.description }}</p>
-    </div>
+        <div class="container-fluid">
+            <a class="btn btn-primary" href="/api/image/{{ image.id }}?download=1">Download</a>
+            <a class="btn btn-outline-primary" href="/api/image/{{ image.id }}?thumbnail=1&download=1">Download Thumbnail</a>
+
+            {% if edit %}
+                <button type="submit" class="btn btn-outline-primary">
+                    <img src="https://cdn.icon-icons.com/icons2/1518/PNG/512/tickmono_105887.png" width="16" height="16">
+                </button>
+            {% else %}
+            <a href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}" class="btn btn-outline-primary">
+                    <img src="https://cdn.icon-icons.com/icons2/685/PNG/512/settings_icon-icons.com_61211.png" width="16" height="16">
+                </a>
+            {% endif %}
+
+        </div>
+
+        <div class="container-fluid">
+            <p>{{ image.width }} x {{ image.height }}</p>
+
+            {% if edit %}
+                <textarea class="form-control" name="description">{{ image.description }}</textarea>
+            {% else %}
+                <p>{{ image.description }}</p>
+            {% endif %}
+        </div>
+
+    </form>
 
 {% endblock %}

@@ -46,7 +46,7 @@ def is_image_allowed(pil_image):
 
 @app.route('/')
 def view_index():
-    from .model import Image
+    from .model import GalleryImage, Image
 
     pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
 
@@ -60,7 +60,7 @@ def view_upload():
     from PIL import Image as PilImage
     from sqlalchemy.exc import IntegrityError
 
-    from .model import Image, Metadata, Thumbnail
+    from .model import GalleryImage, Image, Metadata, Thumbnail
 
     error = None
 
@@ -108,7 +108,7 @@ def view_upload():
 
 @app.route('/search')
 def view_search():
-    from .model import Image
+    from .model import GalleryImage, Image
 
     # TODO: this fails if the query contains a whitespace
     query = request.args.get("query", None)
@@ -124,9 +124,24 @@ def view_search():
     return render_template("search.html", pagination=pagination, query=query)
 
 
-@app.route('/image/<string:image_id>')
+@app.route('/image/<string:image_id>', methods=["GET", "POST"])
 def view_image(image_id):
-    from .model import Image
+    from .model import GalleryImage, Image
+
+    if request.method == "POST":
+        error = None
+
+        try:
+            image = Image.query.filter_by(id=image_id).first()
+            image.description = request.form["description"]
+            db.session.commit()
+
+            flash("The image was updated.")
+
+        except Exception:
+            error = "There was an error while updating."
+
+        return render_template("image.html", image=image, edit=False, error=error)
 
     edit = request.args.get("edit", False)
 
@@ -154,7 +169,7 @@ def view_404(e):
 def api_image(image_id):
     from flask import Response
 
-    from .model import Image, Thumbnail
+    from .model import GalleryImage, Image, Thumbnail
 
     thumbnail = request.args.get('thumbnail', False)
     download = request.args.get('download', False)
