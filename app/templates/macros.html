@@ -34,17 +34,23 @@
 {% endmacro %}
 
 {% macro render_messages() %}
-{% if error %}
-<div class="alert alert-danger" role="alert">
-    {{ error }}
-</div>
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% for category, message in messages %}
+
+{% if category == "error" %}
+{% set cls = "alert-danger" %}
+{% elif category == "success" %}
+{% set cls = "alert-success" %}
+{% else %}
+{% set cls = "alert-primary" %}
 {% endif %}
 
-{% with messages = get_flashed_messages() %}
-{% for message in messages %}
-<div class="alert alert-success" role="alert">
+<div class="alert {{ cls }}" role="alert">
     {{ message }}
 </div>
+
 {% endfor %}
 {% endwith %}
+
 {% endmacro %}

@@ -61,8 +61,6 @@ def view_upload():
 
     from .model import Image, Metadata, Thumbnail
 
-    error = None
-
     # Upload was initiated
     if request.method == "POST":
         uploaded = request.files["formFile"]
@@ -75,8 +73,8 @@ def view_upload():
 
             # Check if uploaded image is jpeg using pillow
             if not is_image_allowed(pil_image):
-                error = "Image does not have the appropriate format. Only jpeg is allowed."
-                return render_template("upload.html", error=error)
+                flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
+                return render_template("upload.html")
 
             # Add image to database 
             image = Image()
@@ -98,12 +96,12 @@ def view_upload():
 
             try:
                 db.session.commit()
-                flash("Image was successfully uploaded!")
+                flash("Image was successfully uploaded!", category="success")
 
             except IntegrityError:
-                error = "We already have this image in our database."
+                flash("We already have this image in our database.", category="error")
 
-    return render_template("upload.html", error=error)
+    return render_template("upload.html")
 
 
 @app.route("/search")
@@ -126,27 +124,27 @@ def view_search():
 
 @app.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
+    from flask import flash
+
     from .model import Image
+
+    image = Image.query.filter_by(id=image_id).first()
 
     # Gallery was updated
     if request.method == "POST":
-        error = None
-
         try:
-            image = Image.query.filter_by(id=image_id).first()
             image.description = request.form["description"]
             db.session.commit()
 
-            flash("The image was updated.")
+            flash("The image was updated.", category="success")
 
-        except Exception:
-            error = "There was an error while updating."
+        except Exception as e:
+            app.logger.warning(e)
+            flash("There was an error while updating.", category="error")
 
-        return render_template("image.html", image=image, edit=False, error=error)
+        return render_template("image.html", image=image, edit=False)
 
     edit = request.args.get("edit", False)
-
-    image = Image.query.filter_by(id=image_id).first()
 
     return render_template("image.html", image=image, edit=edit)
 
