@@ -1,3 +1,18 @@
+{% macro gallery_card(gallery) %}
+<div class="card">
+    <img alt="{{ gallery.description }}" class="card-img-top" src="">
+    <div class="card-body">
+        <a href="/gallery/{{ gallery.id }}">
+            <h5 class="card-title">{{ gallery.name }}</h5>
+            <p class="card-text">{{ gallery.description }}</p>
+        </a>
+    </div>
+    <div class="card-footer">
+        <small class="text-muted">Uploaded {{ gallery.added_date|dateformat }}</small>
+    </div>
+</div>
+{% endmacro %}
+
 {% macro image_card(image) %}
 <div class="card">
     <a href="/image/{{ image.id }}">

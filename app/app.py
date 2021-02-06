@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request
+from flask import flash, Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
 from .fmt import dateformat
@@ -45,7 +45,7 @@ def is_image_allowed(pil_image):
 
 @app.route("/")
 def view_index():
-    from .model import Image
+    from .model import GalleryImage, Image
 
     pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
 
@@ -54,7 +54,6 @@ def view_index():
 
 @app.route("/upload", methods=["GET", "POST"])
 def view_upload():
-    from flask import flash
     from io import BytesIO
     from PIL import Image as PilImage
     from sqlalchemy.exc import IntegrityError
@@ -127,16 +126,14 @@ def view_search():
     return render_template("search.html", pagination=pagination, query=querystring)
 
 
-@app.route("/image/<string:image_id>", methods=["GET", "POST"])
+@app.route("/image/<string:image_id>", methods=["GET", "PUT"])
 def view_image(image_id):
-    from flask import flash
-
     from .model import Image
 
     image = Image.query.filter_by(id=image_id).first()
 
     # Gallery was updated
-    if request.method == "POST":
+    if request.method == "PUT":
         try:
             image.description = request.form["description"]
             db.session.commit()
@@ -154,16 +151,45 @@ def view_image(image_id):
     return render_template("image.html", image=image, edit=edit)
 
 
-@app.route("/gallery")
-@app.route("/gallery/<int:gallery_id>")
-def view_gallery(gallery_id=None):
+@app.route("/gallery", methods=["GET", "POST"])
+def view_gallery():
+    from .model import Gallery
+
+    edit = request.args.get("edit", False)
+
+    pagination = Gallery.query.order_by(Gallery.id.desc()).paginate(per_page=IMAGES_PER_PAGE)
+
+    if request.method == "POST":
+        app.logger.info(request.form)
+
+        gallery = Gallery()
+        gallery.name = request.form["galleryName"]
+        gallery.description = request.form["galleryDescription"]
+
+        db.session.add(gallery)
+
+        try:
+            db.session.commit()
+            flash("Gallery was created.", category="success")
+
+        except Exception as e:
+            flash("There was an error while creating a new gallery.", category="error")
+            app.logger.info(e)
+
+    return render_template("gallery.html", pagination=pagination, edit=edit)
+
+
+@app.route("/gallery/<int:gallery_id>", methods=["GET", "PUT"])
+def view_gallery_specific(gallery_id):
     from .model import Gallery
 
     edit = request.args.get("edit", False)
 
     pagination = Gallery.query.paginate(per_page=IMAGES_PER_PAGE)
 
-    return render_template("gallery.html", pagination=pagination)
+    gallery = Gallery.query.filter_by(id=gallery_id).first()
+
+    return render_template("gallery_specific.html", gallery=gallery, pagination=pagination, edit=edit)
 
 
 @app.errorhandler(404)

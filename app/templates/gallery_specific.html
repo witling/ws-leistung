@@ -1,0 +1,38 @@
+{% from "macros.html" import gallery_card, render_pagination %}
+
+{% extends "base.html" %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+
+<img alt="{{ gallery.description }}" class="img-fluid d-block mx-auto" src="/api/image/{{ gallery.id }}">
+
+<form action="{{ url_for(request.endpoint, gallery_id=gallery.id) }}" class="mx-5" method="PUT">
+
+    <div class="container-fluid" id="gallery-actions-bar">
+
+        {% if edit %}
+        <button class="btn btn-outline-primary" type="submit">
+            <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
+        </button>
+        {% else %}
+        <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, gallery_id=gallery.id, edit=1) }}">
+            <img height="16" src="{{ url_for('static', filename='edit.png') }}"
+                 width="16">
+        </a>
+        {% endif %}
+
+    </div>
+
+    <div class="container-fluid">
+        {% if edit %}
+        <textarea class="form-control" name="description">{{ gallery.description }}</textarea>
+        {% else %}
+        <p>{{ gallery.description }}</p>
+        {% endif %}
+    </div>
+
+</form>
+
+{% endblock %}
