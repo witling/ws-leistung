@@ -126,14 +126,14 @@ def view_search():
     return render_template("search.html", pagination=pagination, query=querystring)
 
 
-@app.route("/image/<string:image_id>", methods=["GET", "PUT"])
+@app.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
     from .model import Image
 
     image = Image.query.filter_by(id=image_id).first()
 
     # Gallery was updated
-    if request.method == "PUT":
+    if request.method == "POST":
         try:
             image.description = request.form["description"]
             db.session.commit()
@@ -179,7 +179,7 @@ def view_gallery():
     return render_template("gallery.html", pagination=pagination, edit=edit)
 
 
-@app.route("/gallery/<int:gallery_id>", methods=["GET", "PUT"])
+@app.route("/gallery/<int:gallery_id>", methods=["GET", "POST"])
 def view_gallery_specific(gallery_id):
     from .model import Gallery
 
@@ -195,6 +195,15 @@ def view_gallery_specific(gallery_id):
 @app.errorhandler(404)
 def view_404(e):
     return render_template("404.html"), 404
+
+
+@app.route("/api/gallery/<int:gallery_id>", methods=["GET", "POST"])
+def api_gallery(gallery_id):
+
+    if request.method == "POST":
+        return {}
+
+    return Gallery.query.all()
 
 
 @app.route("/api/image/<string:image_id>")

@@ -8,7 +8,7 @@
 
 <img alt="{{ gallery.description }}" class="img-fluid d-block mx-auto" src="/api/image/{{ gallery.id }}">
 
-<form action="{{ url_for(request.endpoint, gallery_id=gallery.id) }}" class="mx-5" method="PUT">
+<form action="{{ url_for(request.endpoint, gallery_id=gallery.id) }}" class="mx-5" method="POST">
 
     <div class="container-fluid" id="gallery-actions-bar">
 
