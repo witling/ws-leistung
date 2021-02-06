@@ -108,8 +108,13 @@ def view_upload():
 def view_search():
     from .model import Image
 
-    # TODO: this fails if the query contains a whitespace
-    query = request.args.get("query", None)
+    querystring = request.args.get("query", None)
+
+    if " " in querystring:
+        query = querystring.replace(" ",",")
+    else:
+        query = querystring
+
     page = request.args.get("page", None)
     if page:
         page = int(page)
@@ -119,7 +124,7 @@ def view_search():
     # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
     pagination = Image.query.filter(Image.description.match(query)).paginate(page=page, per_page=IMAGES_PER_PAGE)
 
-    return render_template("search.html", pagination=pagination, query=query)
+    return render_template("search.html", pagination=pagination, query=querystring)
 
 
 @app.route("/image/<string:image_id>", methods=["GET", "POST"])
