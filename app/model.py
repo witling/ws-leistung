@@ -21,7 +21,6 @@ class Image(db.Model):
 class Thumbnail(db.Model):
     __tablename__ = "thumbnails"
 
-    # id = db.relationship("Image", backref="image", lazy=True)
     id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     content = db.Column(db.LargeBinary)
 
@@ -29,7 +28,6 @@ class Thumbnail(db.Model):
 class Metadata(db.Model):
     __tablename__ = "metadata"
 
-    # id = db.relationship("Image", backref="image", lazy=True)
     id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     key = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(255))
