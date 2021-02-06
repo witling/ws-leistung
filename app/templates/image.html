@@ -19,11 +19,11 @@
 
         {% if edit %}
         <button class="btn btn-outline-primary" type="submit">
-            <img height="16" src="https://cdn.icon-icons.com/icons2/1518/PNG/512/tickmono_105887.png" width="16">
+            <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
         </button>
         {% else %}
         <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}">
-            <img height="16" src="https://cdn.icon-icons.com/icons2/685/PNG/512/settings_icon-icons.com_61211.png"
+            <img height="16" src="{{ url_for('static', filename='edit.png') }}"
                  width="16">
         </a>
         {% endif %}
