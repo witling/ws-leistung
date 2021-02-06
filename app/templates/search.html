@@ -6,15 +6,15 @@
 
 {% block content %}
 
-    <h2>Search results for "{{query}}" ...</h2>
+<h2>Search results for "{{query}}" ...</h2>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for image in pagination.items %}
-            {{ image_card(image) }}
-        {% endfor %}
-    </div>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for image in pagination.items %}
+    {{ image_card(image) }}
+    {% endfor %}
+</div>
 
-    {% set url_params = "query=" ~ query %}
-    {{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
+{% set url_params = "query=" ~ query %}
+{{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
 
 {% endblock %}

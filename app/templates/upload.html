@@ -6,19 +6,19 @@
 
 {% block content %}
 
-    {{ render_messages() }}
+{{ render_messages() }}
 
-    <form class="mx-5" action="/upload" method="POST" enctype="multipart/form-data">
-        <label for="formFile" class="form-label">Please choose an image to upload</label>
-        <input class="form-control" type="file" id="formFile" name="formFile" accept="image/jpeg">
+<form action="/upload" class="mx-5" enctype="multipart/form-data" method="POST">
+    <label class="form-label" for="formFile">Please choose an image to upload</label>
+    <input accept="image/jpeg" class="form-control" id="formFile" name="formFile" type="file">
 
-        <div class="mb-3">
-            <label for="descriptionInput" class="form-label">Description</label>
-            <textarea class="form-control" id="descriptionInput" aria-describedby="name Help" name="description"></textarea>
-            <div id="descriptionHelp" class="form-text">Describe the pictures content.</div>
-        </div>
+    <div class="mb-3">
+        <label class="form-label" for="descriptionInput">Description</label>
+        <textarea aria-describedby="name Help" class="form-control" id="descriptionInput" name="description"></textarea>
+        <div class="form-text" id="descriptionHelp">Describe the pictures content.</div>
+    </div>
 
-        <button type="submit" class="btn btn-outline-primary my-3">Upload</button>
-    </form>
+    <button class="btn btn-outline-primary my-3" type="submit">Upload</button>
+</form>
 
 {% endblock %}

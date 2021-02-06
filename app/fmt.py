@@ -1,5 +1,4 @@
 def dateformat(date):
-    from datetime import datetime
     import calendar
 
     day = date.day

@@ -1,59 +1,66 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        {% block head %}
-            <title>Image Archive - {% block title %}{% endblock %}</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-            <link rel="icon" type="image/png" href="https://cdn.icon-icons.com/icons2/1502/PNG/512/officedatabase_103574.png"/>
-        {% endblock %}
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">
-                    <img src="https://cdn.icon-icons.com/icons2/1502/PNG/512/officedatabase_103574.png" alt="" width="30"
-                         height="24" class="d-inline-block align-middle">
-                    Image Archive
-                </a>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'view_index' %}active{% endif %}" aria-current="page" href="/">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'view_gallery' %}active{% endif %}" href="/gallery">Galleries</a>
-                        </li>
+<head>
+    {% block head %}
+    <title>Image Archive - {% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" rel="stylesheet">
+    <link href="https://cdn.icon-icons.com/icons2/1502/PNG/512/officedatabase_103574.png" rel="icon" type="image/png"/>
+    <script src="{{ url_for('static', filename='site.js') }}"></script>
+    {% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img alt="" class="d-inline-block align-middle" height="24"
+                 src="https://cdn.icon-icons.com/icons2/1502/PNG/512/officedatabase_103574.png" width="30">
+            Image Archive
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a aria-current="page" class="nav-link {% if request.endpoint == 'view_index' %}active{% endif %}"
+                       href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'view_gallery' %}active{% endif %}" href="/gallery">Galleries</a>
+                </li>
 
-                        <li class="nav-item">
-                            <a class="btn btn-primary {% if request.endpoint == 'view_upload' %}active{% endif %}" href="/upload">Upload</a>
-                        </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary {% if request.endpoint == 'view_upload' %}active{% endif %}"
+                       href="/upload">Upload</a>
+                </li>
 
-                        <li class="nav-item">
-                            <form action="/search" method="GET">
-                                <div class="input-group">
-                                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query">
-                                    <button class="btn btn-outline-primary" type="submit">Search</button>
-                                </div>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <div id="content" class="container">
-            {% block content %}{% endblock %}
+                <li class="nav-item">
+                    <form action="/search" method="GET" id="searchform">
+                        <div class="input-group">
+                            <input id="searchbar" aria-label="Search" class="form-control me-2" name="query" placeholder="Search"
+                                   type="search">
+                            <button class="btn btn-outline-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </li>
+            </ul>
         </div>
+    </div>
+</nav>
 
-        <div id="footer" class="container">
-            {% block footer %}
-                    2021 made by MW, JB, LK
-            {% endblock %}
-        </div>
+<div class="container" id="content">
+    {% block content %}{% endblock %}
+</div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    </body>
+<div class="container" id="footer">
+    {% block footer %}
+    2021 made by MW, JB, LK
+    {% endblock %}
+</div>
+
+<script crossorigin="anonymous"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

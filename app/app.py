@@ -1,4 +1,3 @@
-import logging
 import os
 
 from flask import Flask, render_template, request
@@ -12,12 +11,10 @@ app.secret_key = b"89?_!30xc0vy03#+34+2+"
 # Configure custom jinja2 filters
 app.jinja_env.filters["dateformat"] = dateformat
 
-
 # Configure sqlalchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["SQLALCHEMY_DATABASE_URI"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
-
 
 THUMBNAIL_SIZE = (256, 256)
 IMAGES_PER_PAGE = 9
@@ -48,7 +45,7 @@ def is_image_allowed(pil_image):
 
 @app.route("/")
 def view_index():
-    from .model import GalleryImage, Image
+    from .model import Image
 
     pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
 
@@ -62,14 +59,14 @@ def view_upload():
     from PIL import Image as PilImage
     from sqlalchemy.exc import IntegrityError
 
-    from .model import GalleryImage, Image, Metadata, Thumbnail
+    from .model import Image, Metadata, Thumbnail
 
     error = None
 
     # Upload was initiated
     if request.method == "POST":
         uploaded = request.files["formFile"]
-        
+
         raw = uploaded.read()
         image_id = get_hash_value(raw)
 
@@ -111,7 +108,7 @@ def view_upload():
 
 @app.route("/search")
 def view_search():
-    from .model import GalleryImage, Image
+    from .model import Image
 
     # TODO: this fails if the query contains a whitespace
     query = request.args.get("query", None)
@@ -129,7 +126,7 @@ def view_search():
 
 @app.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
-    from .model import GalleryImage, Image
+    from .model import Image
 
     # Gallery was updated
     if request.method == "POST":
@@ -175,7 +172,7 @@ def view_404(e):
 def api_image(image_id):
     from flask import Response
 
-    from .model import GalleryImage, Image, Thumbnail
+    from .model import Image, Thumbnail
 
     thumbnail = request.args.get("thumbnail", False)
     download = request.args.get("download", False)

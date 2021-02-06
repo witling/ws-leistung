@@ -1,7 +1,7 @@
 -- https://stackoverflow.com/a/10267699/13401153
 CREATE TABLE images (
     id CHAR(64),
-    description VARCHAR(255),
+    description TEXT,
     added_date DATE NOT NULL,
     height INT,
     width INT,
@@ -21,7 +21,7 @@ CREATE TABLE thumbnails (
 CREATE TABLE metadata (
     id CHAR(64),
     key INT NOT NULL,
-    value VARCHAR(255) NOT NULL,
+    value TEXT NOT NULL,
 
     PRIMARY KEY(id, key),
     CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
@@ -30,7 +30,7 @@ CREATE TABLE metadata (
 CREATE TABLE galleries (
     id SERIAL,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
+    description TEXT,
     added_date DATE NOT NULL,
 
     PRIMARY KEY(id)

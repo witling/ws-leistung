@@ -6,8 +6,8 @@
 
 {% block content %}
 
-    <button type="button" class="btn btn-outline-primary m-auto">Create new gallery</button>
+<button class="btn btn-outline-primary m-auto" type="button">Create new gallery</button>
 
-    {{ render_pagination(pagination, request.endpoint) }}
+{{ render_pagination(pagination, request.endpoint) }}
 
 {% endblock %}

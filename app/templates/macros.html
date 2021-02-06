@@ -1,48 +1,50 @@
 {% macro image_card(image) %}
-    <div class="card">
-        <a href="/image/{{ image.id }}">
-            <img src="/api/image/{{ image.id }}?thumbnail=1" class="card-img-top" alt="{{ image.description }}">
-        </a>
-        <div class="card-body">
-            <p class="card-text">{{ image.description }}</p>
-        </div>
-        <div class="card-footer">
-            <small class="text-muted">Uploaded {{ image.added_date|dateformat }}</small>
-        </div>
+<div class="card">
+    <a href="/image/{{ image.id }}">
+        <img alt="{{ image.description }}" class="card-img-top" src="/api/image/{{ image.id }}?thumbnail=1">
+    </a>
+    <div class="card-body">
+        <p class="card-text">{{ image.description }}</p>
     </div>
+    <div class="card-footer">
+        <small class="text-muted">Uploaded {{ image.added_date|dateformat }}</small>
+    </div>
+</div>
 {% endmacro %}
 
 {% macro render_pagination(pagination, endpoint, url_params="") %}
-    <nav aria-label="...">
-        <ul class="pagination pagination-sm">
-            {%- for page in pagination.iter_pages() %}
+<nav aria-label="Page navigation" id="paginator">
+    <ul class="pagination pagination-sm">
+        {%- for page in pagination.iter_pages() %}
 
-                {% if page %}
-                  {% if page != pagination.page %}
-                  <li class="page-item"><a class="page-link" href="{{ url_for(endpoint, page=page) }}{% if url_params %}&{{ url_params }}{% endif %}">{{ page }}</a></li>
-                  {% else %}
-                    <li class="page-item active" aria-current="page"><span class="page-link">{{ page }}</span></li>
-                  {% endif %}
-                {% else %}
-                    <span class=ellipsis>…</span>
-                {% endif %}
-            {%- endfor %}
-        </ul>
-    </nav>
+        {% if page %}
+        {% if page != pagination.page %}
+        <li class="page-item"><a class="page-link"
+                                 href="{{ url_for(endpoint, page=page) }}{% if url_params %}&{{ url_params }}{% endif %}">{{
+            page }}</a></li>
+        {% else %}
+        <li aria-current="page" class="page-item active"><span class="page-link">{{ page }}</span></li>
+        {% endif %}
+        {% else %}
+        <span class=ellipsis>…</span>
+        {% endif %}
+        {%- endfor %}
+    </ul>
+</nav>
 {% endmacro %}
 
 {% macro render_messages() %}
-    {% if error %}
-        <div class="alert alert-danger" role="alert">
-            {{ error }}
-        </div>
-    {% endif %}
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}
+</div>
+{% endif %}
 
-    {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-            <div class="alert alert-success" role="alert">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endwith %}
+{% with messages = get_flashed_messages() %}
+{% for message in messages %}
+<div class="alert alert-success" role="alert">
+    {{ message }}
+</div>
+{% endfor %}
+{% endwith %}
 {% endmacro %}
