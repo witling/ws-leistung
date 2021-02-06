@@ -111,7 +111,7 @@ def view_search():
     querystring = request.args.get("query", None)
 
     if " " in querystring:
-        query = querystring.replace(" ",",")
+        query = querystring.replace(" ", ",")
     else:
         query = querystring
 
