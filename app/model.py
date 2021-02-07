@@ -15,6 +15,8 @@ class Image(db.Model):
 
     # one-to-one relationship
     thumbnail = db.relationship("Thumbnail", backref="image", lazy=True, uselist=False, cascade="all, delete")
+
+    # one-to-many relationship
     meta = db.relationship("Metadata", backref="image", lazy=True, cascade="all, delete")
 
 
