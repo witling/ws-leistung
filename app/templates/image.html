@@ -49,8 +49,38 @@
         {% if edit %}
         <textarea class="form-control" name="description">{{ image.description }}</textarea>
         {% else %}
-        <p>{{ image.description }}</p>
+            {% if image.description %}
+                <p>{{ image.description }}</p>
+            {% else %}
+                <p><i>No description.</i></p>
+            {% endif %}
         {% endif %}
+    </div>
+
+    <p>
+        <a class="btn btn-secondary btn-sm" data-bs-toggle="collapse" href="#collapseMetadata" role="button" aria-expanded="false" aria-controls="collapseMetadata">
+            Metadata
+        </a>
+    </p>
+    <div class="collapse" id="collapseMetadata">
+        <div class="card card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Key</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for meta in image.meta %}
+                    <tr>
+                        <td>{{ meta.key }}</td>
+                        <td>{{ meta.value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+      </div>
     </div>
 
 </form>

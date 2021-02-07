@@ -60,11 +60,13 @@ def view_upload():
                 flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
                 return render_template("upload.html")
 
+            width, height = pil_image.size
+
             # Add image to database 
             image = Image()
             image.id = image_id
-            image.height = image.height
-            image.width = image.width
+            image.height = height
+            image.width = width
             image.description = request.form["description"]
             image.content = raw
 
@@ -73,8 +75,18 @@ def view_upload():
             image.thumbnail.content = create_thumbnail(raw)
 
             # List exif metadata
-            for key, value in pil_image.getexif().items():
-                image.meta.append(Metadata(key=key, value=str(value)))
+            for key, raw_value in pil_image.getexif().items():
+                try:
+                    if isinstance(raw_value, bytes):
+                        value = raw_value.decode("utf-8", errors="replace").replace("\x00", "\uFFFD")
+                    else:
+                        value = str(raw_value)
+
+                    image.meta.append(Metadata(key=key, value=value))
+
+                except UnicodeDecodeError:
+                    current_app.logger.warning("cannot decode value for key %d", key)
+
 
             db.session.add(image)
 

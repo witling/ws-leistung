@@ -29,7 +29,7 @@
 
 {% macro render_pagination(pagination, endpoint, url_params="") %}
 <nav aria-label="Page navigation" id="paginator">
-    <ul class="pagination pagination-sm">
+    <ul class="pagination">
         {%- for page in pagination.iter_pages() %}
 
         {% if page %}
