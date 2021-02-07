@@ -43,6 +43,11 @@ def is_image_allowed(pil_image):
     return pil_image.format.lower() == "jpeg"
 
 
+@app.errorhandler(404)
+def view_404(e):
+    return render_template("404.html"), 404
+
+
 @app.route("/")
 def view_index():
     from .model import GalleryImage, Image
@@ -58,7 +63,7 @@ def view_upload():
     from PIL import Image as PilImage
     from sqlalchemy.exc import IntegrityError
 
-    from .model import Image, Metadata, Thumbnail
+    from .model import GalleryImage, Image, Metadata, Thumbnail
 
     # Upload was initiated
     if request.method == "POST":
@@ -105,7 +110,7 @@ def view_upload():
 
 @app.route("/search")
 def view_search():
-    from .model import Image
+    from .model import GalleryImage, Image
 
     querystring = request.args.get("query", None)
 
@@ -128,7 +133,7 @@ def view_search():
 
 @app.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
-    from .model import Image
+    from .model import GalleryImage, Image
 
     image = Image.query.filter_by(id=image_id).first()
 
@@ -151,8 +156,8 @@ def view_image(image_id):
     return render_template("image.html", image=image, edit=edit)
 
 
-@app.route("/gallery", methods=["GET", "POST"])
-def view_gallery():
+@app.route("/galleries", methods=["GET", "POST"])
+def view_galleries():
     from .model import Gallery
 
     edit = request.args.get("edit", False)
@@ -176,41 +181,74 @@ def view_gallery():
             flash("There was an error while creating a new gallery.", category="error")
             app.logger.info(e)
 
-    return render_template("gallery.html", pagination=pagination, edit=edit)
+    return render_template("galleries.html", pagination=pagination, edit=edit)
 
 
 @app.route("/gallery/<int:gallery_id>", methods=["GET", "POST"])
-def view_gallery_specific(gallery_id):
-    from .model import Gallery
+def view_gallery(gallery_id):
+    from .model import Gallery, GalleryImage
 
     edit = request.args.get("edit", False)
 
-    pagination = Gallery.query.paginate(per_page=IMAGES_PER_PAGE)
-
     gallery = Gallery.query.filter_by(id=gallery_id).first()
-
-    return render_template("gallery_specific.html", gallery=gallery, pagination=pagination, edit=edit)
-
-
-@app.errorhandler(404)
-def view_404(e):
-    return render_template("404.html"), 404
-
-
-@app.route("/api/gallery/<int:gallery_id>", methods=["GET", "POST"])
-def api_gallery(gallery_id):
+    pagination = GalleryImage.query.filter_by(gallery_id=gallery_id).paginate(per_page=IMAGES_PER_PAGE)
 
     if request.method == "POST":
-        return {}
+        gallery.name = request.form["name"]
+        gallery.description = request.form["description"]
 
-    return Gallery.query.all()
+        try:
+            db.session.commit()
+            flash("Gallery was updated.", category="success")
+
+        except Exception as e:
+            app.logger.warning(e)
+            flash("There was an error while updating.", category="error")
+
+    return render_template("gallery.html", gallery=gallery, pagination=pagination, edit=edit)
+
+
+@app.route("/api/galleries")
+def api_galleries():
+    from flask import jsonify
+
+    from .model import Gallery
+
+    galleries = []
+    for gallery in Gallery.query.all():
+        galleries.append({"id": gallery.id, "name": gallery.name, "description": gallery.description})
+
+    return jsonify(galleries)
+
+
+@app.route("/api/gallery/<int:gallery_id>/<string:operation>")
+def api_gallery(gallery_id, operation):
+    from .model import Gallery, GalleryImage
+
+    image_id = request.args["image_id"]
+
+    gallery = Gallery.query.filter_by(id=gallery_id).first()
+    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+
+    if operation == "add":
+        gallery.images.append(gallery_image)
+
+    elif operation == "remove":
+        gallery.images.remove(gallery_image)
+
+    else:
+        raise Exception("unsupported operation {}".format(operation))
+
+    db.session.commit()
+
+    return {}
 
 
 @app.route("/api/image/<string:image_id>")
 def api_image(image_id):
     from flask import Response
 
-    from .model import Image, Thumbnail
+    from .model import GalleryImage, Image, Thumbnail
 
     thumbnail = request.args.get("thumbnail", False)
     download = request.args.get("download", False)

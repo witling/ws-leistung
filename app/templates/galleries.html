@@ -1,0 +1,33 @@
+{% from "macros.html" import gallery_card, render_messages, render_pagination %}
+
+{% extends "base.html" %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+
+{{ render_messages() }}
+
+<form action="/gallery" class="mx-5" id="create-gallery" method="POST">
+    <label class="form-label" for="createGalleryName">Name</label>
+    <input class="form-control" id="createGalleryName" name="galleryName" required type="text">
+
+    <label class="form-label" for="createGalleryDescription">Description</label>
+    <textarea class="form-control" id="createGalleryDescription" name="galleryDescription"></textarea>
+
+    <button class="btn btn-outline-primary my-3" type="submit">Create new gallery</button>
+</form>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for gallery in pagination.items %}
+    <div class="col">
+        {{ gallery_card(gallery) }}
+    </div>
+    {% endfor %}
+</div>
+
+{{ render_pagination(pagination, request.endpoint) }}
+
+{% endblock %}
