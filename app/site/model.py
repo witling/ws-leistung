@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_serialize import FlaskSerializeMixin
 
-from .app import db
+from database import db
 
 
 class Image(db.Model):
