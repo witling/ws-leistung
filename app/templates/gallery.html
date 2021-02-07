@@ -1,4 +1,4 @@
-{% from "macros.html" import image_card, render_messages, render_pagination %}
+{% from "macros.html" import image_card, render_confirm, render_messages, render_pagination %}
 
 {% extends "base.html" %}
 
@@ -37,9 +37,17 @@
         </a>
         {% endif %}
 
-        <a class="btn btn-outline-danger" href="/gallery/{{ gallery.id }}/delete">
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#galleryDeleteModal">
             <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
-        </a>
+        </button>
+        {{
+            render_confirm(
+                "galleryDeleteModal",
+                "/gallery/" ~ gallery.id ~ "/delete",
+                "Delete gallery?",
+                "Do you really want to delete the gallery '" ~ gallery.name ~ "'?"
+            )
+        }}
     </div>
 
 </form>
