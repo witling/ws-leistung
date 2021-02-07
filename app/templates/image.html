@@ -11,23 +11,36 @@
 <img alt="{{ image.description }}" class="img-fluid d-block mx-auto" src="/api/image/{{ image.id }}">
 
 <form action="{{ url_for(request.endpoint, image_id=image.id) }}" class="mx-5" method="POST">
+    <input id="imageId" name="imageId" type="hidden" value="{{ image.id }}">
 
     <div class="container-fluid" id="image-actions-bar">
-        <a class="btn btn-primary" href="/api/image/{{ image.id }}?download=1">Download</a>
-        <a class="btn btn-outline-primary" href="/api/image/{{ image.id }}?thumbnail=1&download=1">Download
-            Thumbnail</a>
+        <div class="btn-group">
+            <a class="btn btn-primary" href="/api/image/{{ image.id }}?download=1">Download</a>
 
-        {% if edit %}
-        <button class="btn btn-outline-primary" type="submit">
-            <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
-        </button>
-        {% else %}
-        <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}">
-            <img height="16" src="{{ url_for('static', filename='edit.png') }}"
-                 width="16">
-        </a>
-        {% endif %}
+            <a class="btn btn-outline-primary" href="/api/image/{{ image.id }}?thumbnail=1&download=1">Download
+                Thumbnail</a>
 
+            <div class="dropdown">
+                <button aria-expanded="false" aria-haspopup="true"
+                        class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" href="#" id="galleryDropdownOpen">
+                    <img height="16" src="{{ url_for('static', filename='plus.png') }}" width="16">
+                    Gallery
+                </button>
+                <div aria-labelledby="galleryDropdownOpen" class="dropdown-menu" id="galleryDropdownSelect">
+                </div>
+            </div>
+
+            {% if edit %}
+            <button class="btn btn-outline-primary" type="submit">
+                <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
+            </button>
+            {% else %}
+            <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}">
+                <img height="16" src="{{ url_for('static', filename='edit.png') }}"
+                     width="16">
+            </a>
+            {% endif %}
+        </div>
     </div>
 
     <div class="container-fluid">

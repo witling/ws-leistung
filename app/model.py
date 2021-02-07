@@ -15,6 +15,8 @@ class Image(db.Model):
 
     # one-to-one relationship
     thumbnail = db.relationship("Thumbnail", backref="image", lazy=True, uselist=False, cascade="all, delete")
+
+    # one-to-many relationship
     meta = db.relationship("Metadata", backref="image", lazy=True, cascade="all, delete")
 
 
@@ -49,3 +51,5 @@ class GalleryImage(db.Model):
 
     gallery_id = db.Column(db.Integer, db.ForeignKey("galleries.id"), primary_key=True)
     image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+
+    image = db.relationship("Image", lazy=True)

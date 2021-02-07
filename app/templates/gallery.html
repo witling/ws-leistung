@@ -1,13 +1,56 @@
-{% from "macros.html" import image_card, render_pagination %}
+{% from "macros.html" import image_card, render_messages, render_pagination %}
 
 {% extends "base.html" %}
 
-{% block title %}Gallery{% endblock %}
+{% block title %}Gallery - {{ gallery.name }}{% endblock %}
 
 {% block content %}
 
-<button class="btn btn-outline-primary m-auto" type="button">Create new gallery</button>
+{{ render_messages() }}
 
-{{ render_pagination(pagination, request.endpoint) }}
+<form action="{{ url_for(request.endpoint, gallery_id=gallery.id) }}" class="mx-5" method="POST">
+
+    <div class="container-fluid">
+        {% if edit %}
+        <input class="form-control" name="name" type="text" value="{{ gallery.name }}">
+        <textarea class="form-control" name="description">{{ gallery.description }}</textarea>
+        {% else %}
+        <h2>{{ gallery.name }}</h2>
+        <p>{{ gallery.description }}</p>
+        {% endif %}
+    </div>
+
+    <div class="container-fluid" id="gallery-actions-bar">
+        <a class="btn btn-primary" href="/api/gallery/{{ gallery.id }}/export">
+            <img src="{{ url_for('static', filename='arrowdown.png') }}" height="16" width="16">
+            Export
+        </a>
+
+        {% if edit %}
+        <button class="btn btn-outline-primary" type="submit">
+            <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
+        </button>
+        {% else %}
+        <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, gallery_id=gallery.id, edit=1) }}">
+            <img height="16" src="{{ url_for('static', filename='edit.png') }}"
+                 width="16">
+        </a>
+        {% endif %}
+
+    </div>
+
+</form>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for gallery_image in pagination.items %}
+    <div class="col">
+        {{ image_card(gallery_image.image) }}
+    </div>
+    {% endfor %}
+</div>
+
+{{ render_pagination(pagination) }}
 
 {% endblock %}
