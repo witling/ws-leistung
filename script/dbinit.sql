@@ -44,3 +44,7 @@ CREATE TABLE galleries_images (
     CONSTRAINT fk_gallery FOREIGN KEY(gallery_id) REFERENCES galleries(id),
     CONSTRAINT fk_image FOREIGN KEY(image_id) REFERENCES images(id)
 );
+
+CREATE VIEW search_pool AS
+        SELECT id AS image_id, description AS value FROM images
+UNION   SELECT image_id, value FROM metadata;
