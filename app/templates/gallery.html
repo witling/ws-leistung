@@ -46,10 +46,43 @@
 
 <hr>
 
+<div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+    <ol class="carousel-indicators">
+        {% for gallery_image in pagination.items %}
+        <li data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></li>
+        {% endfor %}
+    </ol>
+    <div class="carousel-inner">
+
+        {% for gallery_image in pagination.items %}
+            <div class="carousel-item {% if loop.first %}active{% endif %}">
+                <img src="/api/image/{{ gallery_image.image.id }}" class="d-block w-100" alt="{{ gallery_image.image.description }}">
+                <div class="carousel-caption d-none d-md-block">
+                    <p>{{ gallery_image.image.description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+    <a class="carousel-control-prev" href="#galleryCarousel" role="button" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#galleryCarousel" role="button" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </a>
+</div>
+
+<hr>
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for gallery_image in pagination.items %}
     <div class="col">
         {{ image_card(gallery_image.image) }}
+        <a class="btn btn-outline-danger" href="/api/gallery/{{ gallery.id }}/remove?image_id={{ gallery_image.image.id }}">
+            <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
+        </a>
     </div>
     {% endfor %}
 </div>

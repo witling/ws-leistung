@@ -138,7 +138,7 @@ def view_image(image_id):
 
     image = Image.query.filter_by(id=image_id).first()
 
-    # Gallery was updated
+    # Image was updated
     if request.method == "POST":
         try:
             image.description = request.form["description"]
@@ -163,6 +163,7 @@ def view_galleries():
 
     edit = request.args.get("edit", False)
 
+    # Gallery was updated
     if request.method == "POST":
         app.logger.info(request.form)
 
@@ -255,17 +256,19 @@ def api_gallery_add_image(gallery_id):
 
 @app.route("/api/gallery/<int:gallery_id>/remove")
 def api_gallery_remove_image(gallery_id):
+    from flask import redirect, url_for
+
     from .model import Gallery, GalleryImage
 
     image_id = request.args["image_id"]
-    gallery = Gallery.query.filter_by(id=gallery_id).first()
 
-    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
-    gallery.images.remove(gallery_image)
-
+    gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first()
+    db.session.delete(gallery_image)
     db.session.commit()
 
-    return {}
+    flash("Image was removed from gallery.", category="success");
+
+    return redirect(url_for("view_gallery", gallery_id=gallery_id))
 
 
 @app.route("/api/gallery/<int:gallery_id>/export")
@@ -287,7 +290,7 @@ def api_gallery_export(gallery_id):
 def api_image(image_id):
     from flask import Response
 
-    from .model import GalleryImage, Image, Thumbnail
+    from .model import Image, Thumbnail
 
     thumbnail = request.args.get("thumbnail", False)
     download = request.args.get("download", False)
