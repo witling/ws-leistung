@@ -8,9 +8,13 @@
 
 <h2>Search results for "{{query}}" ...</h2>
 
+<hr>
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for image in pagination.items %}
-    {{ image_card(image) }}
+    <div class="col">
+        {{ image_card(image) }}
+    </div>
     {% endfor %}
 </div>
 
