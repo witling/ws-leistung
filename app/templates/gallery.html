@@ -21,6 +21,10 @@
     </div>
 
     <div class="container-fluid" id="gallery-actions-bar">
+        <a class="btn btn-primary" href="/api/gallery/{{ gallery.id }}/export">
+            <img src="{{ url_for('static', filename='arrowdown.png') }}" height="16" width="16">
+            Export
+        </a>
 
         {% if edit %}
         <button class="btn btn-outline-primary" type="submit">

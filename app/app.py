@@ -225,23 +225,34 @@ def api_galleries():
 def api_gallery(gallery_id, operation):
     from .model import Gallery, GalleryImage
 
-    image_id = request.args["image_id"]
-
     gallery = Gallery.query.filter_by(id=gallery_id).first()
-    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
 
-    if operation == "add":
-        gallery.images.append(gallery_image)
+    if operation == "add" or operation == "remove":
+        image_id = request.args["image_id"]
+        gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
 
-    elif operation == "remove":
-        gallery.images.remove(gallery_image)
+        if operation == "add":
+            gallery.images.append(gallery_image)
+        else:
+            gallery.images.remove(gallery_image)
 
-    else:
-        raise Exception("unsupported operation {}".format(operation))
+        db.session.commit()
 
-    db.session.commit()
+        return {}
 
-    return {}
+@app.route("/api/gallery/<int:gallery_id>/export")
+def api_gallery_export(gallery_id):
+    from flask import Response
+
+    from .model import Gallery
+
+    gallery = Gallery.query.filter_by(id=gallery_id).first();
+    file_name = "gallery_{}.json".format(gallery.id)
+
+    response = Response({}, mimetype="application/json")
+    response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
+
+    return response
 
 
 @app.route("/api/image/<string:image_id>")
