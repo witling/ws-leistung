@@ -111,6 +111,7 @@ def view_upload():
 @app.route("/search")
 def view_search():
     from .model import GalleryImage, Image
+    from sqlalchemy import or_
 
     querystring = request.args.get("query", None)
 
@@ -126,7 +127,7 @@ def view_search():
     app.logger.info("searching %s", query)
 
     # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
-    pagination = Image.query.filter(Image.description.match(query)).paginate(page=page, per_page=IMAGES_PER_PAGE)
+    pagination = Image.query.filter(or_(Image.description.contains(query), Image.description.match(query))).paginate(page=page, per_page=IMAGES_PER_PAGE)
 
     return render_template("search.html", pagination=pagination, query=querystring)
 
