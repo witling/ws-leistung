@@ -163,8 +163,6 @@ def view_galleries():
 
     edit = request.args.get("edit", False)
 
-    pagination = Gallery.query.order_by(Gallery.id.desc()).paginate(per_page=IMAGES_PER_PAGE)
-
     if request.method == "POST":
         app.logger.info(request.form)
 
@@ -182,11 +180,15 @@ def view_galleries():
             flash("There was an error while creating a new gallery.", category="error")
             app.logger.info(e)
 
+    pagination = Gallery.query.order_by(Gallery.id.desc()).paginate(per_page=IMAGES_PER_PAGE)
+
     return render_template("galleries.html", pagination=pagination, edit=edit)
 
 
 @app.route("/gallery/<int:gallery_id>", methods=["GET", "POST"])
 def view_gallery(gallery_id):
+    from flask import redirect, url_for
+
     from .model import Gallery, GalleryImage
 
     edit = request.args.get("edit", False)
@@ -206,7 +208,23 @@ def view_gallery(gallery_id):
             app.logger.warning(e)
             flash("There was an error while updating.", category="error")
 
+
     return render_template("gallery.html", gallery=gallery, pagination=pagination, edit=edit)
+
+
+@app.route("/gallery/<int:gallery_id>/delete")
+def view_gallery_delete(gallery_id):
+    from flask import redirect, url_for
+
+    from .model import Gallery, GalleryImage
+
+    gallery = Gallery.query.filter_by(id=gallery_id).first()
+    db.session.delete(gallery)
+    db.session.commit()
+
+    flash("Gallery was deleted.", category="success")
+
+    return redirect(url_for("view_galleries"))
 
 
 @app.route("/api/galleries")
@@ -215,42 +233,51 @@ def api_galleries():
 
     from .model import Gallery
 
-    galleries = []
-    for gallery in Gallery.query.all():
-        galleries.append({"id": gallery.id, "name": gallery.name, "description": gallery.description})
+    galleries = Gallery.query.all()
 
-    return jsonify(galleries)
+    return jsonify(list(map(lambda gallery: gallery.as_dict, galleries)))
 
 
-@app.route("/api/gallery/<int:gallery_id>/<string:operation>")
-def api_gallery(gallery_id, operation):
+@app.route("/api/gallery/<int:gallery_id>/add")
+def api_gallery_add_image(gallery_id):
     from .model import Gallery, GalleryImage
 
+    image_id = request.args["image_id"]
     gallery = Gallery.query.filter_by(id=gallery_id).first()
 
-    if operation == "add" or operation == "remove":
-        image_id = request.args["image_id"]
-        gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+    gallery.images.append(gallery_image)
 
-        if operation == "add":
-            gallery.images.append(gallery_image)
-        else:
-            gallery.images.remove(gallery_image)
+    db.session.commit()
 
-        db.session.commit()
+    return {}
 
-        return {}
+
+@app.route("/api/gallery/<int:gallery_id>/remove")
+def api_gallery_remove_image(gallery_id):
+    from .model import Gallery, GalleryImage
+
+    image_id = request.args["image_id"]
+    gallery = Gallery.query.filter_by(id=gallery_id).first()
+
+    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+    gallery.images.remove(gallery_image)
+
+    db.session.commit()
+
+    return {}
+
 
 @app.route("/api/gallery/<int:gallery_id>/export")
 def api_gallery_export(gallery_id):
-    from flask import Response
+    from flask import jsonify
 
     from .model import Gallery
 
     gallery = Gallery.query.filter_by(id=gallery_id).first();
     file_name = "gallery_{}.json".format(gallery.id)
 
-    response = Response({}, mimetype="application/json")
+    response = jsonify(gallery.as_dict)
     response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
 
     return response

@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask_serialize import FlaskSerializeMixin
 
 from .app import db
 
@@ -35,7 +36,7 @@ class Metadata(db.Model):
     value = db.Column(db.String(255))
 
 
-class Gallery(db.Model):
+class Gallery(FlaskSerializeMixin, db.Model):
     __tablename__ = "galleries"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,10 +44,10 @@ class Gallery(db.Model):
     description = db.Column(db.String(255))
     added_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    images = db.relationship("GalleryImage", lazy=True)
+    images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
 
 
-class GalleryImage(db.Model):
+class GalleryImage(FlaskSerializeMixin, db.Model):
     __tablename__ = "galleries_images"
 
     gallery_id = db.Column(db.Integer, db.ForeignKey("galleries.id"), primary_key=True)
