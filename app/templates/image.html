@@ -1,4 +1,4 @@
-{% from "macros.html" import render_messages %}
+{% from "macros.html" import render_messages, render_confirm %}
 
 {% extends "base.html" %}
 
@@ -31,6 +31,17 @@
             </div>
 
             {% if edit %}
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDeleteModal">
+                <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
+            </button>
+            {{
+                render_confirm(
+                    "imageDeleteModal",
+                    "/image/" ~ image.id ~ "/delete",
+                    "Delete image?",
+                    "Do you really want to delete this image?"
+                )
+            }}
             <button class="btn btn-outline-primary" type="submit">
                 <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
             </button>

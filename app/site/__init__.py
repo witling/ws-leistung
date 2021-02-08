@@ -146,6 +146,17 @@ def view_image(image_id):
     return render_template("image.html", image=image, edit=edit)
 
 
+@site.route("/image/<string:image_id>/delete")
+def view_image_delete(image_id):
+    image = Image.query.filter_by(id=image_id).first()
+    db.session.delete(image)
+    db.session.commit()
+
+    flash("Image was deleted.", category="success")
+
+    return redirect(url_for("site.view_index"))
+
+
 @site.route("/galleries", methods=["GET", "POST"])
 def view_galleries():
     edit = request.args.get("edit", False)
