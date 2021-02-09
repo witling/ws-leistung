@@ -215,7 +215,7 @@ def view_gallery_delete(gallery_id):
 
     flash("Gallery was deleted.", category="success")
 
-    return redirect(url_for("site.view_galleries"))
+    return redirect(url_for("site.view_index"))
 
 
 @site.route("/api/galleries")
