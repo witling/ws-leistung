@@ -21,10 +21,10 @@
     </div>
 
     <div class="container-fluid" id="gallery-actions-bar">
-        <a class="btn btn-primary" href="/api/gallery/{{ gallery.id }}/export">
+        <!--a class="btn btn-primary" href="/api/gallery/{{ gallery.id }}/export">
             <img src="{{ url_for('static', filename='arrowdown.png') }}" height="16" width="16">
             Export
-        </a>
+        </a-->
 
         {% if edit %}
         <button class="btn btn-outline-primary" type="submit">
@@ -54,7 +54,7 @@
 
 <hr>
 
-<div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel">
+<div id="gallery-carousel" class="carousel slide" data-bs-ride="carousel">
     <ol class="carousel-indicators">
         {% for gallery_image in pagination.items %}
         <li data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></li>
@@ -72,11 +72,11 @@
         {% endfor %}
 
     </div>
-    <a class="carousel-control-prev" href="#galleryCarousel" role="button" data-bs-slide="prev">
+    <a class="carousel-control-prev" href="#gallery-carousel" role="button" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </a>
-    <a class="carousel-control-next" href="#galleryCarousel" role="button" data-bs-slide="next">
+    <a class="carousel-control-next" href="#gallery-carousel" role="button" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </a>
@@ -88,9 +88,12 @@
     {% for gallery_image in pagination.items %}
     <div class="col">
         {{ image_card(gallery_image.image) }}
-        <a class="btn btn-outline-danger" href="/api/gallery/{{ gallery.id }}/remove?image_id={{ gallery_image.image.id }}">
-            <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
-        </a>
+        <p class="gallery-image-buttons text-end">
+            <a class="btn btn-outline-danger" href="/api/gallery/{{ gallery.id }}/remove?image_id={{ gallery_image.image.id }}">
+                Remove
+                <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
+            </a>
+        </p>
     </div>
     {% endfor %}
 </div>

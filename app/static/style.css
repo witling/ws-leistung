@@ -12,6 +12,16 @@
     padding: 10px;
 }
 
-#galleryCarousel {
+#gallery-carousel {
     padding: 10px;
+}
+
+#gallery-carousel {
+    padding: 10px;
+}
+
+.gallery-image-buttons {
+    padding: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
 }

@@ -47,4 +47,4 @@ CREATE TABLE galleries_images (
 
 CREATE VIEW search_pool AS
         SELECT id AS image_id, description AS value FROM images
-UNION   SELECT image_id, value FROM metadata;
+UNION   SELECT id AS image_id, value FROM metadata;
