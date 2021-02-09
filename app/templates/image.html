@@ -58,6 +58,7 @@
         <p>{{ image.width }} x {{ image.height }}</p>
 
         {% if edit %}
+        <label class="form-label" for="description">Description</label>
         <textarea class="form-control" name="description">{{ image.description }}</textarea>
         {% else %}
             {% if image.description %}
