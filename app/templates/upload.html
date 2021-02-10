@@ -9,13 +9,19 @@
 {{ render_messages() }}
 
 <form action="/upload" class="mx-5" enctype="multipart/form-data" method="POST">
-    <label class="form-label" for="formFile">Please choose an image to upload</label>
-    <input accept="image/jpeg" class="form-control" id="formFile" name="formFile" type="file">
 
     <div class="mb-3">
+        <label class="form-label" for="formFile">Please choose an image to upload</label>
+        <input accept="image/jpeg" class="form-control" id="formFile" name="formFile" type="file">
+        <div class="form-text">Select your image.</div>
+
         <label class="form-label" for="descriptionInput">Description</label>
         <textarea aria-describedby="name Help" class="form-control" id="descriptionInput" name="description"></textarea>
         <div class="form-text" id="descriptionHelp">Describe the pictures content.</div>
+
+        <label class="form-label" for="tags">Tags</label>
+        <input class="form-control" type="text" name="tags">
+        <div class="form-text">Separate tags by comma. Whitespace will be replaced by dash.</div>
     </div>
 
     <button class="btn btn-outline-primary my-3" type="submit">Upload</button>

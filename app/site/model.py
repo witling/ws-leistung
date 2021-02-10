@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask_serialize import FlaskSerializeMixin
+from typing import List
 
 from database import db
 
@@ -20,6 +21,29 @@ class Image(db.Model):
     # one-to-many relationship
     meta = db.relationship("Metadata", backref="image", lazy=True, cascade="all, delete")
 
+    # one-to-many relationship
+    tags = db.relationship("Tag", lazy=True, cascade="save-update, merge, delete, delete-orphan")
+
+    def tags_to_str(self):
+        return ', '.join(map(lambda tag: tag.name, self.tags))
+
+    def update_tags(self, tag_names: List[str]):
+        # `reversed` avoids loop corruption, because we modify the list
+        for tag in reversed(self.tags):
+            # If the image has this tag but it is not in the new tag list
+            if tag.name not in tag_names:
+                # Remove it
+                self.tags.remove(tag)
+            else:
+                # The image has the tag and it is also in the new tag list ->
+                # Do nothing
+                tag_names.remove(tag.name)
+
+        # Create all tags that weren't present on the image already
+        for tag_name in tag_names:
+            if tag_name:
+                self.tags.append(Tag(name=tag_name))
+
 
 class Thumbnail(db.Model):
     __tablename__ = "thumbnails"
@@ -34,6 +58,13 @@ class Metadata(db.Model):
     id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     key = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(255))
+
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    name = db.Column(db.String(16), primary_key=True)
 
 
 class Gallery(FlaskSerializeMixin, db.Model):

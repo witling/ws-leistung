@@ -29,6 +29,18 @@ def is_image_allowed(pil_image):
     return pil_image.format.lower() == "jpeg"
 
 
+def parse_tag_names(raw: str):
+    tags = []
+
+    for part in raw.split(','):
+        name = part.strip().replace(' ', '-')
+
+        if name:
+            tags.append(name)
+
+    return tags
+
+
 @site.errorhandler(404)
 def view_404(e):
     return render_template("404.html"), 404
@@ -69,6 +81,10 @@ def view_upload():
             image.width = width
             image.description = request.form["description"]
             image.content = raw
+
+            # Set tags on image
+            new_tag_names = parse_tag_names(request.form["tags"])
+            image.update_tags(new_tag_names)
 
             # Generate thumbnail and add to database
             image.thumbnail = Thumbnail()
@@ -131,6 +147,12 @@ def view_image(image_id):
     if request.method == "POST":
         try:
             image.description = request.form["description"]
+
+            # parse tags according to rules e.g. split at ','; replace whitespace with '-'
+            new_tag_names = parse_tag_names(request.form["tags"])
+
+            image.update_tags(new_tag_names)
+
             db.session.commit()
 
             flash("The image was updated.", category="success")

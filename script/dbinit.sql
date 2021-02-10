@@ -27,6 +27,14 @@ CREATE TABLE metadata (
     CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
 );
 
+CREATE TABLE tags (
+    id CHAR(64) NOT NULL,
+    name VARCHAR(32) NOT NULL,
+
+    PRIMARY KEY(id, name),
+    CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
+);
+
 CREATE TABLE galleries (
     id SERIAL,
     name VARCHAR(255) NOT NULL,
@@ -47,4 +55,4 @@ CREATE TABLE galleries_images (
 
 CREATE VIEW search_pool AS
         SELECT id AS image_id, description AS value FROM images
-UNION   SELECT id AS image_id, value FROM metadata;
+UNION   SELECT id AS image_id, name AS value FROM tags;

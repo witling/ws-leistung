@@ -13,6 +13,7 @@
 </div>
 {% endmacro %}
 
+
 {% macro image_card(image) %}
 <div class="card">
     <a href="/image/{{ image.id }}">
@@ -26,6 +27,12 @@
     </div>
 </div>
 {% endmacro %}
+
+
+{% macro render_tag(tag) %}
+<div class="d-inline text-white bg-secondary" style="padding:3px;margin:5px;">{{ tag.name }}</div>
+{% endmacro %}
+
 
 {% macro render_pagination(pagination, endpoint, url_params="") %}
 <nav aria-label="Page navigation" id="paginator">
@@ -48,6 +55,7 @@
 </nav>
 {% endmacro %}
 
+
 {% macro render_messages() %}
 {% with messages = get_flashed_messages(with_categories=True) %}
 {% for category, message in messages %}
@@ -67,6 +75,7 @@
 {% endfor %}
 {% endwith %}
 {% endmacro %}
+
 
 {% macro render_confirm(id, url, title, message) %}
 <!-- Modal -->
