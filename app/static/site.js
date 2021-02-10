@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 let url = `/api/gallery/${gallery.id}/add?image_id=${imageId}`;
                 fetchBackground(url, function (response, statusCode) {
                     if (statusCode === 200) {
-                        pushToast("Image was added to the gallery.", "success");
+                        pushToast(`Image was added to gallery "${gallery.name}".`, "success");
                     } else {
                         pushToast("There was an error while adding the image to the gallery.", "error")
                     }
