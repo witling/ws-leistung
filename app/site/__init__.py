@@ -9,6 +9,7 @@ site = Blueprint('site', __name__)
 THUMBNAIL_SIZE = (256, 256)
 IMAGES_PER_PAGE = 9
 
+
 def get_hash_value(img: bytes):
     from hashlib import sha256
 
@@ -141,7 +142,7 @@ def view_search():
 
 @site.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
-    image = Image.query.filter_by(id=image_id).first()
+    image = Image.query.filter_by(id=image_id).first_or_404()
 
     # Image was updated
     if request.method == "POST":
@@ -170,7 +171,7 @@ def view_image(image_id):
 
 @site.route("/image/<string:image_id>/delete")
 def view_image_delete(image_id):
-    image = Image.query.filter_by(id=image_id).first()
+    image = Image.query.filter_by(id=image_id).first_or_404()
     db.session.delete(image)
     db.session.commit()
 
@@ -210,7 +211,7 @@ def view_galleries():
 def view_gallery(gallery_id):
     edit = request.args.get("edit", False)
 
-    gallery = Gallery.query.filter_by(id=gallery_id).first()
+    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
     pagination = GalleryImage.query.filter_by(gallery_id=gallery_id).paginate(per_page=IMAGES_PER_PAGE)
 
     if request.method == "POST":
@@ -231,7 +232,7 @@ def view_gallery(gallery_id):
 
 @site.route("/gallery/<int:gallery_id>/delete")
 def view_gallery_delete(gallery_id):
-    gallery = Gallery.query.filter_by(id=gallery_id).first()
+    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
     db.session.delete(gallery)
     db.session.commit()
 
@@ -252,7 +253,7 @@ def api_galleries():
 @site.route("/api/gallery/<int:gallery_id>/add")
 def api_gallery_add_image(gallery_id):
     image_id = request.args["image_id"]
-    gallery = Gallery.query.filter_by(id=gallery_id).first()
+    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
 
     gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
     gallery.images.append(gallery_image)
@@ -266,7 +267,7 @@ def api_gallery_add_image(gallery_id):
 def api_gallery_remove_image(gallery_id):
     image_id = request.args["image_id"]
 
-    gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first()
+    gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
     db.session.delete(gallery_image)
     db.session.commit()
 
@@ -279,7 +280,7 @@ def api_gallery_remove_image(gallery_id):
 def api_gallery_export(gallery_id):
     from flask import jsonify
 
-    gallery = Gallery.query.filter_by(id=gallery_id).first();
+    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404();
     file_name = "gallery_{}.json".format(gallery.id)
 
     response = jsonify(gallery.as_dict)
@@ -297,9 +298,9 @@ def api_image(image_id):
 
     # Determine whether the thumbnail or the original image was requested
     if not thumbnail:
-        image = Image.query.filter_by(id=image_id).first()
+        image = Image.query.filter_by(id=image_id).first_or_404()
     else:
-        image = Thumbnail.query.filter_by(id=image_id).first()
+        image = Thumbnail.query.filter_by(id=image_id).first_or_404()
 
     response = Response(image.content, mimetype="image/jpeg")
 
