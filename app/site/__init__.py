@@ -32,7 +32,7 @@ def is_image_allowed(pil_image):
 def parse_tag_names(raw: str):
     tags = []
 
-    for part in raw.split(','):
+    for part in raw.lower().split(','):
         name = part.strip().replace(' ', '-')
 
         if name:
