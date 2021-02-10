@@ -56,7 +56,7 @@
 
 <hr>
 
-<div id="gallery-carousel" class="carousel slide" data-bs-ride="carousel">
+<div id="gallery-carousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
     <ol class="carousel-indicators">
         {% for gallery_image in pagination.items %}
         <li data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></li>
@@ -66,7 +66,7 @@
 
         {% for gallery_image in pagination.items %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
-                <img src="/api/image/{{ gallery_image.image.id }}" class="d-block w-100" alt="{{ gallery_image.image.description }}">
+                <img src="/api/image/{{ gallery_image.image.id }}" class="d-block m-auto" alt="{{ gallery_image.image.description }}">
                 <div class="carousel-caption d-none d-md-block">
                     <p>{{ gallery_image.image.description }}</p>
                 </div>
