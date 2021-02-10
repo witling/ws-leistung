@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
     const MIN_SEARCH_LENGTH = 3;
+    const TOAST_CONTAINER_ID = "custom-alerts-container";
+
+    function createUUID() {
+        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+    }
 
     function error() {
         let bar = document.getElementById("searchbar");
@@ -48,9 +53,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 let url = `/api/gallery/${gallery.id}/add?image_id=${imageId}`;
                 fetchBackground(url, function (response, statusCode) {
                     if (statusCode === 200) {
-                        alert("Image was added to the gallery.");
+                        pushToast("Image was added to the gallery.", "success");
                     } else {
-                        alert("There was an error while adding the image to the gallery.");
+                        pushToast("There was an error while adding the image to the gallery.", "error")
                     }
                 });
 
@@ -59,6 +64,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
             galleryDropdownSelect.appendChild(node);
         }
+    }
+
+    function pushToast(msg, ty) {
+        let uuid = createUUID();
+
+        let node = document.createElement("div");
+        node.id = `toast-notice-${uuid}`;
+        node.className = "toast";
+        node.setAttribute("role", "alert");
+        node.setAttribute("aria-live", "assertive");
+        node.setAttribute("aria-atomic", "true");
+
+        switch (ty) {
+            case "success":
+                node.classList.toggle("bg-success");
+                break;
+
+            case "error":
+                node.classList.toggle("bg-danger");
+                node.classList.toggle("text-white");
+                break;
+
+            default:
+                node.classList.toggle("bg-light");
+                break
+        }
+
+        let header = document.createElement("div");
+        header.className = "toast-header";
+        header.innerHTML = '<strong class="mr-auto">Alert</strong><button type="button" class="ml-2 mb-1 btn-close" data-bs-dismiss="toast"></button>';
+
+        let body = document.createElement("div");
+        body.className = "toast-body";
+        body.innerText = msg;
+
+        node.appendChild(header);
+        node.appendChild(body);
+
+        let observer = new MutationObserver(function (mutations) {
+            for (let mutation of mutations) {
+                if (mutation.attributeName === "class" && node.className.includes("hide")) {
+                    node.remove();
+                    observer.disconnect();
+                }
+            }
+        });
+
+        observer.observe(node, { attributes: true });
+
+        document.getElementById(TOAST_CONTAINER_ID).appendChild(node);
+
+        let toast = new bootstrap.Toast(node);
+        toast.show();
     }
 
     let galleryDropdownOpen = document.getElementById("galleryDropdownOpen");
