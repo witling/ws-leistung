@@ -42,6 +42,11 @@ def parse_tag_names(raw: str):
     return tags
 
 
+@site.errorhandler(500)
+def view_500(e):
+    return render_template("500.html"), 500
+
+
 @site.errorhandler(404)
 def view_404(e):
     return render_template("404.html"), 404
