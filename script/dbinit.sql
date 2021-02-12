@@ -3,6 +3,7 @@ CREATE TABLE images (
     id CHAR(64),
     description TEXT,
     added_date DATE NOT NULL,
+    taken_date DATE,
     height INT,
     width INT,
     content BYTEA NOT NULL,

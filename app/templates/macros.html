@@ -23,7 +23,10 @@
         <p class="card-text">{{ image.description }}</p>
     </div>
     <div class="card-footer">
-        <small class="text-muted">Uploaded {{ image.added_date|dateformat }}</small>
+        <small class="text-muted">Uploaded {{ image.added_date|dateformat }}</small><br>
+        {% if image.taken_date is not none %}
+            <small class="text-muted">Created {{ image.taken_date|dateformat }}</small>
+        {% endif %}
     </div>
 </div>
 {% endmacro %}
@@ -92,6 +95,24 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Abort</button>
                 <a class="btn btn-primary" href="{{ url }}">Proceed</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro render_discard(id, url, title, message) %}
+<!-- Modal -->
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="{{ url }}">Discard</a>
             </div>
         </div>
     </div>

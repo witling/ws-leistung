@@ -1,4 +1,4 @@
-{% from "macros.html" import render_confirm, render_messages, render_tag %}
+{% from "macros.html" import render_confirm, render_discard, render_messages, render_tag %}
 
 {% extends "base.html" %}
 
@@ -40,6 +40,16 @@
                     "/image/" ~ image.id ~ "/delete",
                     "Delete image?",
                     "Do you really want to delete this image?"
+                )
+            }}
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDiscardModal">
+                <img height="16" src="{{ url_for('static', filename='cross.png') }}" width="16">
+            </button>
+            {{
+                render_discard(
+                    "imageDiscardModal",
+                    "/image/" ~ image.id,
+                    "Discard changes?"
                 )
             }}
             <button class="btn btn-outline-primary" type="submit">

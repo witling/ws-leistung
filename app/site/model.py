@@ -11,6 +11,7 @@ class Image(db.Model):
     id = db.Column(db.String(32), primary_key=True)
     description = db.Column(db.String(255))
     added_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    taken_date = db.Column(db.DateTime)
     height = db.Column(db.Integer)
     width = db.Column(db.Integer)
     content = db.Column(db.LargeBinary)
