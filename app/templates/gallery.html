@@ -1,4 +1,4 @@
-{% from "macros.html" import image_card, render_confirm, render_messages, render_pagination %}
+{% from "macros.html" import image_card, render_confirm, render_discard, render_messages, render_pagination %}
 
 {% extends "base.html" %}
 
@@ -29,6 +29,16 @@
         </a-->
 
         {% if edit %}
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDiscardModal">
+            <img height="16" src="{{ url_for('static', filename='cross.png') }}" width="16">
+        </button>
+        {{
+            render_discard(
+                "imageDiscardModal",
+                "/gallery/" ~ gallery.id,
+                "Discard changes?"
+            )
+        }}
         <button class="btn btn-outline-primary" type="submit">
             <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
         </button>
