@@ -139,10 +139,12 @@ def view_search():
     current_app.logger.info("searching %s", query)
 
     # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
-    # pagination = Image.query.filter(or_(func.lower(Image.description).contains(func.lower(query)), Image.description.match(query))).paginate(page=page, per_page=IMAGES_PER_PAGE)
-    pagination = Image.query.filter(
-        or_(Image.tags.any(or_(Tag.name.contains(func.lower(query)), Tag.name.match(query))), func.lower(Image.description).contains(func.lower(query)), Image.description.match(query))).paginate(
-        page=page, per_page=IMAGES_PER_PAGE)
+
+    query = Image.query.filter(or_(SearchPool.value.ilike(f"%{query}%"), SearchPool.value.match(query)))
+    query = query.join(SearchPool, Image.id == SearchPool.image_id)
+    query = query.distinct(SearchPool.image_id)
+
+    pagination = query.paginate(page=page, per_page=IMAGES_PER_PAGE)
 
     return render_template("search.html", pagination=pagination, query=querystring)
 
