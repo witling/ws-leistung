@@ -206,6 +206,15 @@ def view_galleries():
         gallery.name = request.form["galleryName"]
         gallery.description = request.form["galleryDescription"]
 
+        images = Image.query.all()
+        for image in images:
+            already_added = False
+            for tag in image.tags:
+                if any(tag.name in s for s in request.form.getlist('tag')) and not already_added:
+                    gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
+                    gallery.images.append(gallery_image)
+                    already_added = True
+
         db.session.add(gallery)
 
         try:
