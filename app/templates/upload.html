@@ -12,19 +12,23 @@
 
     <div class="mb-3">
         <label class="form-label" for="formFile">Please choose an image to upload</label>
-        <input accept="image/jpeg" class="form-control" id="formFile" name="formFile" type="file">
+        <input type="file" accept="image/jpeg" class="form-control" name="formFile" required>
         <div class="form-text">Select your image.</div>
 
-        <label class="form-label" for="descriptionInput">Description</label>
-        <textarea aria-describedby="name Help" class="form-control" id="descriptionInput" name="description"></textarea>
-        <div class="form-text" id="descriptionHelp">Describe the pictures content.</div>
+        <label class="form-label" for="takenDate">Taken date</label>
+        <input type="date" name="takenDate">
+        <div class="form-text">On which date was this picture taken?</div>
+
+        <label class="form-label" for="description">Description</label>
+        <textarea class="form-control" name="description"></textarea>
+        <div class="form-text">Describe the pictures content.</div>
 
         <label class="form-label" for="tags">Tags</label>
         <input class="form-control" type="text" name="tags">
         <div class="form-text">Separate tags by comma. Whitespace will be replaced by dash.</div>
     </div>
 
-    <button class="btn btn-outline-primary my-3" type="submit">Upload</button>
+    <button type="submit" class="btn btn-outline-primary my-3">Upload</button>
 </form>
 
 {% endblock %}

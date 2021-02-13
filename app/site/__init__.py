@@ -9,6 +9,7 @@ site = Blueprint('site', __name__)
 THUMBNAIL_SIZE = (256, 256)
 IMAGES_PER_PAGE = 9
 
+EXIF_DATE_CREATED = 36867
 
 def get_hash_value(img: bytes):
     from hashlib import sha256
@@ -66,8 +67,12 @@ def view_upload():
     # Upload was initiated
     if request.method == "POST":
         uploaded = request.files["formFile"]
-
         raw = uploaded.read()
+
+        if not raw:
+            flash("The uploaded file was invalid.", category="error")
+            return render_template("upload.html")
+
         image_id = get_hash_value(raw)
 
         with BytesIO(raw) as raw_buffer:
@@ -78,15 +83,21 @@ def view_upload():
                 flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
                 return render_template("upload.html")
 
-            # 36867 - The date and time when the original image data was generated
-            taken_date_str = pil_image.getexif().get(36867)
+            # If taken date was specified in the form, prefer it over exif data
+            taken_date_str = request.form.get("takenDate")
+            if taken_date_str is not None:
+                taken_date = datetime.strptime(taken_date_str, '%Y-%m-%d')
+            else:
+                # The date and time when the original image data was generated
+                taken_date_str = pil_image.getexif().get(EXIF_DATE_CREATED)
+                taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
+
             width, height = pil_image.size
 
             # Add image to database 
             image = Image()
             image.id = image_id
-            if not taken_date_str is None:
-                image.taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
+            image.taken_date = taken_date
             image.height = height
             image.width = width
             image.description = request.form["description"]
