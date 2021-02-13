@@ -4,6 +4,7 @@ import database
 
 from flask import flash, Flask, render_template, request
 
+from .api import api
 from .fmt import dateformat
 from .site import site
 
@@ -20,6 +21,18 @@ def create_app(config):
 
     database.init_app(app)
 
+
+    @app.errorhandler(500)
+    def view_500(e):
+        return render_template("500.html"), 500
+    
+    
+    @app.errorhandler(404)
+    def view_404(e):
+        return render_template("404.html"), 404
+
+
+    app.register_blueprint(api)
     app.register_blueprint(site)
 
     return app

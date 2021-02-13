@@ -2,7 +2,8 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from io import BytesIO
 from PIL import Image as PilImage
     
-from .model import *
+from model import *
+
 
 site = Blueprint('site', __name__)
 
@@ -44,16 +45,6 @@ def parse_tag_names(raw: str):
     return tags
 
 
-@site.errorhandler(500)
-def view_500(e):
-    return render_template("500.html"), 500
-
-
-@site.errorhandler(404)
-def view_404(e):
-    return render_template("404.html"), 404
-
-
 @site.route("/")
 def view_index():
     pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
@@ -84,14 +75,18 @@ def view_upload():
                 flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
                 return render_template("upload.html")
 
+            
             # If taken date was specified in the form, prefer it over exif data
             taken_date_str = request.form.get("takenDate")
-            if taken_date_str is not None:
+            taken_date = None
+
+            if taken_date_str:
                 taken_date = datetime.strptime(taken_date_str, '%Y-%m-%d')
             else:
                 # The date and time when the original image data was generated
                 taken_date_str = pil_image.getexif().get(EXIF_DATE_CREATED)
-                taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
+                if taken_date_str:
+                    taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
 
             width, height = pil_image.size
 
@@ -140,7 +135,7 @@ def view_upload():
 
 @site.route("/search")
 def view_search():
-    from sqlalchemy import or_, func
+    from sqlalchemy import or_
 
     querystring = request.args.get("query", None)
 
@@ -181,7 +176,6 @@ def view_image(image_id):
             image.update_tags(new_tag_names)
 
             db.session.commit()
-
             flash("The image was updated.", category="success")
 
         except Exception as e:
@@ -193,17 +187,6 @@ def view_image(image_id):
     edit = request.args.get("edit", False)
 
     return render_template("image.html", image=image, edit=edit)
-
-
-@site.route("/image/<string:image_id>/delete")
-def view_image_delete(image_id):
-    image = Image.query.filter_by(id=image_id).first_or_404()
-    db.session.delete(image)
-    db.session.commit()
-
-    flash("Image was deleted.", category="success")
-
-    return redirect(url_for("site.view_index"))
 
 
 @site.route("/galleries", methods=["GET", "POST"])
@@ -265,76 +248,3 @@ def view_gallery(gallery_id):
 
 
     return render_template("gallery.html", gallery=gallery, pagination=pagination, edit=edit)
-
-
-@site.route("/gallery/<int:gallery_id>/delete")
-def view_gallery_delete(gallery_id):
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-    db.session.delete(gallery)
-    db.session.commit()
-
-    flash("Gallery was deleted.", category="success")
-
-    return redirect(url_for("site.view_index"))
-
-
-@site.route("/api/galleries")
-def api_galleries():
-    from flask import jsonify
-
-    galleries = Gallery.query.all()
-
-    return jsonify(list(map(lambda gallery: gallery.as_dict, galleries)))
-
-
-@site.route("/api/gallery/<int:gallery_id>/add")
-def api_gallery_add_image(gallery_id):
-    image_id = request.args["image_id"]
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-
-    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
-    gallery.images.append(gallery_image)
-
-    db.session.commit()
-
-    return {}
-
-
-@site.route("/api/gallery/<int:gallery_id>/remove")
-def api_gallery_remove_image(gallery_id):
-    image_id = request.args["image_id"]
-
-    gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
-    db.session.delete(gallery_image)
-    db.session.commit()
-
-    flash("Image was removed from gallery.", category="success");
-
-    return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
-
-
-@site.route("/api/image/<string:image_id>")
-def api_image(image_id):
-    from flask import Response
-
-    thumbnail = request.args.get("thumbnail", False)
-    download = request.args.get("download", False)
-
-    # Determine whether the thumbnail or the original image was requested
-    if not thumbnail:
-        image = Image.query.filter_by(id=image_id).first_or_404()
-    else:
-        image = Thumbnail.query.filter_by(image_id=image_id).first_or_404()
-
-    response = Response(image.content, mimetype="image/jpeg")
-
-    # If a download was requested, add `Content-Disposition` header
-    if download:
-        if not thumbnail:
-            file_name = "{}.jpeg".format(image.id)
-        else:
-            file_name = "{}_thumb.jpeg".format(image.image_id)
-
-        response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
-
-    return response

@@ -25,6 +25,9 @@ class Image(db.Model):
     # one-to-many relationship
     tags = db.relationship("Tag", lazy=True, cascade="save-update, merge, delete, delete-orphan")
 
+    # one-to-many relationship
+    gallery_images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
+
     def url(self, download=False):
         if download:
             return '/api/image/{}?download=1'.format(self.id)
