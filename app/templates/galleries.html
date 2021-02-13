@@ -21,6 +21,8 @@
       <input class="form-check-input" type="checkbox" id="{{tag.name}}" value="{{tag.name}}" name="tag">
       <label class="form-check-label" for="{{tag.name}}">{{tag.name}}</label>
     </div>
+    {% else %}
+    <i>No tags yet...</i>
     {% endfor %}
     <br>
 

@@ -49,14 +49,14 @@ class Image(db.Model):
 class Thumbnail(db.Model):
     __tablename__ = "thumbnails"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     content = db.Column(db.LargeBinary)
 
 
 class Metadata(db.Model):
     __tablename__ = "metadata"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     key = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(255))
 
@@ -64,7 +64,7 @@ class Metadata(db.Model):
 class Tag(db.Model):
     __tablename__ = "tags"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     name = db.Column(db.String(16), primary_key=True)
 
 

@@ -206,14 +206,14 @@ def view_galleries():
         gallery.name = request.form["galleryName"]
         gallery.description = request.form["galleryDescription"]
 
-        images = Image.query.all()
-        for image in images:
-            already_added = False
-            for tag in image.tags:
-                if any(tag.name in s for s in request.form.getlist('tag')) and not already_added:
-                    gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
-                    gallery.images.append(gallery_image)
-                    already_added = True
+        tag_names = list(request.form.getlist('tag'))
+
+        query = Image.query.join(Tag, Tag.image_id == Image.id)
+        query = query.filter(Tag.name.in_(tag_names))
+
+        for image in query.all():
+            gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
+            gallery.images.append(gallery_image)
 
         db.session.add(gallery)
 
@@ -301,6 +301,7 @@ def api_gallery_remove_image(gallery_id):
     return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
 
 
+# TODO: not needed
 @site.route("/api/gallery/<int:gallery_id>/export")
 def api_gallery_export(gallery_id):
     from flask import jsonify
@@ -325,7 +326,7 @@ def api_image(image_id):
     if not thumbnail:
         image = Image.query.filter_by(id=image_id).first_or_404()
     else:
-        image = Thumbnail.query.filter_by(id=image_id).first_or_404()
+        image = Thumbnail.query.filter_by(image_id=image_id).first_or_404()
 
     response = Response(image.content, mimetype="image/jpeg")
 
