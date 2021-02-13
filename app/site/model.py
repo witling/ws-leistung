@@ -26,9 +26,13 @@ class Image(db.Model):
     tags = db.relationship("Tag", lazy=True, cascade="save-update, merge, delete, delete-orphan")
 
     def url(self, download=False):
+        if download:
+            return '/api/image/{}?download=1'.format(self.id)
         return '/api/image/{}'.format(self.id)
 
     def thumbnail_url(self, download=False):
+        if download:
+            return '/api/image/{}?thumbnail=1&download=1'.format(self.id)
         return '/api/image/{}?thumbnail=1'.format(self.id)
 
     def tags_to_str(self):

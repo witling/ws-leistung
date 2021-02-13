@@ -23,7 +23,7 @@
 {% macro image_card(image) %}
 <div class="card">
     <a href="/image/{{ image.id }}">
-        <img alt="{{ image.description }}" class="card-img-top" src="/api/image/{{ image.id }}?thumbnail=1">
+        <img alt="{{ image.description }}" class="card-img-top" src="{{ image.thumbnail_url() }}">
     </a>
     <div class="card-body">
         <p class="card-text">{{ image.description }}</p>
