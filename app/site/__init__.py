@@ -11,6 +11,7 @@ IMAGES_PER_PAGE = 9
 
 EXIF_DATE_CREATED = 36867
 
+
 def get_hash_value(img: bytes):
     from hashlib import sha256
 
@@ -310,20 +311,6 @@ def api_gallery_remove_image(gallery_id):
     flash("Image was removed from gallery.", category="success");
 
     return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
-
-
-# TODO: not needed
-@site.route("/api/gallery/<int:gallery_id>/export")
-def api_gallery_export(gallery_id):
-    from flask import jsonify
-
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404();
-    file_name = "gallery_{}.json".format(gallery.id)
-
-    response = jsonify(gallery.as_dict)
-    response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
-
-    return response
 
 
 @site.route("/api/image/<string:image_id>")
