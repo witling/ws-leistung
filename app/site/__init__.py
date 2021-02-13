@@ -133,19 +133,19 @@ def view_search():
     querystring = request.args.get("query", None)
 
     if " " in querystring:
-        query = querystring.replace(" ", ",")
+        querytext = querystring.replace(" ", ",")
     else:
-        query = querystring
+        querytext = querystring
 
     page = request.args.get("page", None)
     if page:
         page = int(page)
 
-    current_app.logger.info("searching %s", query)
+    current_app.logger.info("searching %s", querystring)
 
     # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
 
-    query = Image.query.filter(or_(SearchPool.value.ilike(f"%{query}%"), SearchPool.value.match(query)))
+    query = Image.query.filter(or_(SearchPool.value.ilike(f"%{querystring}%"), SearchPool.value.match(querytext)))
     query = query.join(SearchPool, Image.id == SearchPool.image_id)
     query = query.distinct(SearchPool.image_id)
 
@@ -335,7 +335,7 @@ def api_image(image_id):
         if not thumbnail:
             file_name = "{}.jpeg".format(image.id)
         else:
-            file_name = "{}_thumb.jpeg".format(image.id)
+            file_name = "{}_thumb.jpeg".format(image.image_id)
 
         response.headers["Content-Disposition"] = "attachment; filename=\"{}\"".format(file_name)
 
