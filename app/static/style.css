@@ -26,6 +26,10 @@
     padding-right: 5px;
 }
 
+#custom-alerts-container {
+    z-index: 3;
+}
+
 .d-block {
     height: 30vh;
 }
