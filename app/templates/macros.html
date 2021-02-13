@@ -1,11 +1,17 @@
 {% macro gallery_card(gallery) %}
 <div class="card">
-    <img alt="{{ gallery.description }}" class="card-img-top" src="">
+    <a href="/gallery/{{ gallery.id }}">
+        {% set preview_images = gallery.preview_images() %}
+        {% if preview_images %}
+            <img alt="{{ gallery.description }}" class="card-img-top"
+                src="{{ preview_images[0].thumbnail_url() }}">
+        {% else %}
+            <img alt="{{ gallery.description }}" class="card-img-top" src="{{ url_for('static', filename='nothumb.png') }}">
+        {% endif %}
+    </a>
     <div class="card-body">
-        <a href="/gallery/{{ gallery.id }}">
-            <h5 class="card-title">{{ gallery.name }}</h5>
-            <p class="card-text">{{ gallery.description }}</p>
-        </a>
+        <h5 class="card-title">{{ gallery.name }}</h5>
+        <p class="card-text">{{ gallery.description }}</p>
     </div>
     <div class="card-footer">
         <small class="text-muted">Created {{ gallery.added_date|dateformat }}</small>

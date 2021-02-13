@@ -25,6 +25,12 @@ class Image(db.Model):
     # one-to-many relationship
     tags = db.relationship("Tag", lazy=True, cascade="save-update, merge, delete, delete-orphan")
 
+    def url(self, download=False):
+        return '/api/image/{}'.format(self.id)
+
+    def thumbnail_url(self, download=False):
+        return '/api/image/{}?thumbnail=1'.format(self.id)
+
     def tags_to_str(self):
         return ', '.join(map(lambda tag: tag.name, self.tags))
 
@@ -77,6 +83,10 @@ class Gallery(FlaskSerializeMixin, db.Model):
     added_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
+
+    def preview_images(self):
+        query = Image.query.join(GalleryImage).filter_by(gallery_id=self.id).limit(3)
+        return query.all()
 
 
 class GalleryImage(FlaskSerializeMixin, db.Model):
