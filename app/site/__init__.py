@@ -74,14 +74,18 @@ def view_upload():
                 return render_template("upload.html")
 
             # 36867 - The date and time when the original image data was generated
-            taken_date_str = pil_image.getexif().get(36867)
+            taken_date_exif = pil_image.getexif().get(36867)
+            taken_date = request.form["takenDatePicker"]
             width, height = pil_image.size
 
             # Add image to database 
             image = Image()
             image.id = image_id
-            if not taken_date_str is None:
-                image.taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
+            if taken_date is "":
+                if not taken_date_exif is None:
+                    image.taken_date = datetime.strptime(taken_date_exif, '%Y:%m:%d %H:%M:%S')
+            else:
+                image.taken_date = taken_date
             image.height = height
             image.width = width
             image.description = request.form["description"]
