@@ -48,7 +48,7 @@ def create_app(config):
         return redirect(url_for("site.view_index"))
 
 
-    app.register_blueprint(api) # api_proxy, url_prefix="/api")
+    app.register_blueprint(api)
     app.register_blueprint(site)
 
     return app

@@ -147,6 +147,7 @@ def api_image(image_id=None):
     
     return {}
 
+
 def create_gallery(request):
     current_app.logger.info(request.form)
 
