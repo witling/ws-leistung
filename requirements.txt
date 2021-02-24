@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 flask-serialize
 psycopg2-binary
 Pillow
+requests

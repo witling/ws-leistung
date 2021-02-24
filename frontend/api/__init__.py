@@ -17,6 +17,7 @@ def api_galleries():
     return jsonify(list(map(lambda gallery: gallery.as_dict, galleries)))
 
 
+"""
 @api.route("/api/gallery/<int:gallery_id>/add")
 def api_gallery_add_image(gallery_id):
     image_id = request.args["image_id"]
@@ -52,6 +53,7 @@ def api_gallery_delete(gallery_id):
     flash("Gallery was deleted.", category="success")
 
     return redirect(url_for("site.view_index"))
+"""
 
 
 @api.route("/api/image/<string:image_id>")
@@ -81,6 +83,7 @@ def api_image(image_id):
     return response
 
 
+"""
 @api.route("/api/image/<string:image_id>/delete")
 def api_image_delete(image_id):
     image = Image.query.filter_by(id=image_id).first_or_404()
@@ -90,4 +93,4 @@ def api_image_delete(image_id):
     flash("Image was deleted.", category="success")
 
     return redirect(url_for("site.view_index"))
-
+"""

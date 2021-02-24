@@ -7,42 +7,22 @@ from model import *
 
 site = Blueprint('site', __name__)
 
-THUMBNAIL_SIZE = (256, 256)
 IMAGES_PER_PAGE = 9
 
-EXIF_DATE_CREATED = 36867
+def fetch_backend(route, flask_request=None, method='GET'):
+    import requests
 
+    url = f"http://backend:5000{route}"
 
-def get_hash_value(img: bytes):
-    from hashlib import sha256
+    current_app.logger.info(f"requesting backend url: {url}")
 
-    return sha256(img).hexdigest()
+    if flask_request:
+        res = requests.request(method, url, data=flask_request.form, files=flask_request.files)
+    else:
+        res = requests.request(method, url)
 
-
-def create_thumbnail(img: bytes):
-    with BytesIO() as output:
-        image = PilImage.open(BytesIO(img))
-
-        thumbnail = image.resize(THUMBNAIL_SIZE)
-        thumbnail.save(output, format="jpeg")
-
-        return output.getvalue()
-
-
-def is_image_allowed(pil_image):
-    return pil_image.format.lower() == "jpeg"
-
-
-def parse_tag_names(raw: str):
-    tags = []
-
-    for part in raw.lower().split(','):
-        name = part.strip().replace(' ', '-')
-
-        if name:
-            tags.append(name)
-
-    return tags
+    print(res)
+    return res
 
 
 @site.route("/")
@@ -54,81 +34,17 @@ def view_index():
 
 @site.route("/upload", methods=["GET", "POST"])
 def view_upload():
-    from sqlalchemy.exc import IntegrityError
+    #from sqlalchemy.exc import IntegrityError
 
     # Upload was initiated
     if request.method == "POST":
-        uploaded = request.files["formFile"]
-        raw = uploaded.read()
+        fetch_backend("/api/image", request, method="POST")
 
-        if not raw:
-            flash("The uploaded file was invalid.", category="error")
-            return render_template("upload.html")
+        try:
+            flash("Image was successfully uploaded!", category="success")
 
-        image_id = get_hash_value(raw)
-
-        with BytesIO(raw) as raw_buffer:
-            pil_image = PilImage.open(raw_buffer)
-
-            # Check if uploaded image is jpeg using pillow
-            if not is_image_allowed(pil_image):
-                flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
-                return render_template("upload.html")
-
-            
-            # If taken date was specified in the form, prefer it over exif data
-            taken_date_str = request.form.get("takenDate")
-            taken_date = None
-
-            if taken_date_str:
-                taken_date = datetime.strptime(taken_date_str, '%Y-%m-%d')
-            else:
-                # The date and time when the original image data was generated
-                taken_date_str = pil_image.getexif().get(EXIF_DATE_CREATED)
-                if taken_date_str:
-                    taken_date = datetime.strptime(taken_date_str, '%Y:%m:%d %H:%M:%S')
-
-            width, height = pil_image.size
-
-            # Add image to database 
-            image = Image()
-            image.id = image_id
-            image.taken_date = taken_date
-            image.height = height
-            image.width = width
-            image.description = request.form["description"]
-            image.content = raw
-
-            # Set tags on image
-            new_tag_names = parse_tag_names(request.form["tags"])
-            image.update_tags(new_tag_names)
-
-            # Generate thumbnail and add to database
-            image.thumbnail = Thumbnail()
-            image.thumbnail.content = create_thumbnail(raw)
-
-            # List exif metadata
-            for key, raw_value in pil_image.getexif().items():
-                try:
-                    if isinstance(raw_value, bytes):
-                        value = raw_value.decode("utf-8", errors="replace").replace("\x00", "\uFFFD")
-                    else:
-                        value = str(raw_value)
-
-                    image.meta.append(Metadata(key=key, value=value))
-
-                except UnicodeDecodeError:
-                    current_app.logger.warning("cannot decode value for key %d", key)
-
-
-            db.session.add(image)
-
-            try:
-                db.session.commit()
-                flash("Image was successfully uploaded!", category="success")
-
-            except IntegrityError:
-                flash("We already have this image in our database.", category="error")
+        except IntegrityError:
+            flash("We already have this image in our database.", category="error")
 
     return render_template("upload.html")
 
@@ -239,7 +155,9 @@ def view_gallery(gallery_id):
         gallery.description = request.form["description"]
 
         try:
-            db.session.commit()
+            fetch_backend("/api/gallery/create", request=request)
+
+            #db.session.commit()
             flash("Gallery was updated.", category="success")
 
         except Exception as e:
