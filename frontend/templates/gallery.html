@@ -13,9 +13,9 @@
     <div class="container-fluid">
         {% if edit %}
         <label class="form-label" for="name">Name</label>
-        <input class="form-control" name="name" type="text" value="{{ gallery.name }}">
+        <input class="form-control" name="galleryName" type="text" value="{{ gallery.name }}">
         <label class="form-label" for="description">Description</label>
-        <textarea class="form-control" name="description">{{ gallery.description }}</textarea>
+        <textarea class="form-control" name="galleryDescription">{{ gallery.description }}</textarea>
         {% else %}
         <h2>{{ gallery.name }}</h2>
         <p>{{ gallery.description }}</p>

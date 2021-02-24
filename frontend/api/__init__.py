@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from werkzeug.exceptions import HTTPException
 from io import BytesIO
 from PIL import Image as PilImage
 
@@ -6,6 +7,24 @@ from model import *
 
 
 api = Blueprint('api', __name__)
+
+
+def fetch_backend(route, flask_request=None, method='GET'):
+    import requests
+
+    url = f"http://backend:5000{route}"
+
+    current_app.logger.info(f"requesting backend url: {url}")
+
+    if flask_request:
+        res = requests.request(method, url, data=flask_request.form, files=flask_request.files)
+    else:
+        res = requests.request(method, url)
+
+    if res.status_code != 200:
+        raise HTTPException(res.status_code)
+
+    return res
 
 
 @api.route("/api/galleries")
@@ -55,6 +74,12 @@ def api_gallery_delete(gallery_id):
     return redirect(url_for("site.view_index"))
 """
 
+@api.route("/api/gallery/<int:gallery_id>/delete")
+def api_gallery_delete(gallery_id):
+    fetch_backend(f"/api/gallery/{gallery_id}", request, method="DELETE")
+    flash("Gallery was deleted.", category="success")
+    return redirect(url_for("site.view_index"))
+
 
 @api.route("/api/image/<string:image_id>")
 def api_image(image_id):
@@ -82,15 +107,8 @@ def api_image(image_id):
 
     return response
 
-
-"""
 @api.route("/api/image/<string:image_id>/delete")
 def api_image_delete(image_id):
-    image = Image.query.filter_by(id=image_id).first_or_404()
-    db.session.delete(image)
-    db.session.commit()
-
+    fetch_backend(f"/api/image/{image_id}", request, method="DELETE")
     flash("Image was deleted.", category="success")
-
     return redirect(url_for("site.view_index"))
-"""

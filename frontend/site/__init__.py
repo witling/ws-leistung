@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from werkzeug.exceptions import HTTPException 
 from io import BytesIO
 from PIL import Image as PilImage
     
@@ -21,29 +22,27 @@ def fetch_backend(route, flask_request=None, method='GET'):
     else:
         res = requests.request(method, url)
 
-    print(res)
+    if res.status_code != 200:
+        raise HTTPException(res.status_code)
+
     return res
 
 
 @site.route("/")
 def view_index():
     pagination = Image.query.paginate(per_page=IMAGES_PER_PAGE)
-
     return render_template("index.html", pagination=pagination)
 
 
 @site.route("/upload", methods=["GET", "POST"])
 def view_upload():
-    #from sqlalchemy.exc import IntegrityError
-
     # Upload was initiated
     if request.method == "POST":
-        fetch_backend("/api/image", request, method="POST")
-
         try:
+            fetch_backend("/api/image", request, method="POST")
             flash("Image was successfully uploaded!", category="success")
 
-        except IntegrityError:
+        except:
             flash("We already have this image in our database.", category="error")
 
     return render_template("upload.html")
@@ -79,28 +78,21 @@ def view_search():
 
 @site.route("/image/<string:image_id>", methods=["GET", "POST"])
 def view_image(image_id):
-    image = Image.query.filter_by(id=image_id).first_or_404()
+    edit = request.args.get("edit", False)
 
     # Image was updated
     if request.method == "POST":
         try:
-            image.description = request.form["description"]
-
-            # parse tags according to rules e.g. split at ','; replace whitespace with '-'
-            new_tag_names = parse_tag_names(request.form["tags"])
-
-            image.update_tags(new_tag_names)
-
-            db.session.commit()
+            fetch_backend(f"/api/image/{image_id}", request, method="PUT")
             flash("The image was updated.", category="success")
 
         except Exception as e:
             current_app.logger.warning(e)
             flash("There was an error while updating.", category="error")
 
-        return render_template("image.html", image=image, edit=False)
+        edit = False
 
-    edit = request.args.get("edit", False)
+    image = Image.query.filter_by(id=image_id).first_or_404()
 
     return render_template("image.html", image=image, edit=edit)
 
@@ -109,35 +101,17 @@ def view_image(image_id):
 def view_galleries():
     edit = request.args.get("edit", False)
 
-    # Gallery was updated
+    # Gallery should be created
     if request.method == "POST":
-        current_app.logger.info(request.form)
-
-        gallery = Gallery()
-        gallery.name = request.form["galleryName"]
-        gallery.description = request.form["galleryDescription"]
-
-        tag_names = list(request.form.getlist('tag'))
-
-        query = Image.query.join(Tag, Tag.image_id == Image.id)
-        query = query.filter(Tag.name.in_(tag_names))
-
-        for image in query.all():
-            gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
-            gallery.images.append(gallery_image)
-
-        db.session.add(gallery)
-
         try:
-            db.session.commit()
+            fetch_backend(f"/api/gallery", request, method="POST")
             flash("Gallery was created.", category="success")
 
         except Exception as e:
             flash("There was an error while creating a new gallery.", category="error")
-            current_app.logger.info(e)
+            current_app.logger.warning(e)
 
     pagination = Gallery.query.order_by(Gallery.id.desc()).paginate(per_page=IMAGES_PER_PAGE)
-
     tags = Tag.query.distinct(Tag.name).all()
 
     return render_template("galleries.html", pagination=pagination, tags=tags, edit=edit)
@@ -147,22 +121,17 @@ def view_galleries():
 def view_gallery(gallery_id):
     edit = request.args.get("edit", False)
 
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-    pagination = GalleryImage.query.filter_by(gallery_id=gallery_id).paginate(per_page=IMAGES_PER_PAGE)
-
+    # Gallery was updated
     if request.method == "POST":
-        gallery.name = request.form["name"]
-        gallery.description = request.form["description"]
-
         try:
-            fetch_backend("/api/gallery/create", request=request)
-
-            #db.session.commit()
+            fetch_backend(f"/api/gallery/{gallery_id}", request, method="PUT")
             flash("Gallery was updated.", category="success")
 
         except Exception as e:
             current_app.logger.warning(e)
             flash("There was an error while updating.", category="error")
 
+    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+    pagination = GalleryImage.query.filter_by(gallery_id=gallery_id).paginate(per_page=IMAGES_PER_PAGE)
 
     return render_template("gallery.html", gallery=gallery, pagination=pagination, edit=edit)

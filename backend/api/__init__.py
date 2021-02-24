@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from werkzeug.exceptions import HTTPException
 from io import BytesIO
 from PIL import Image as PilImage
 
@@ -42,6 +43,34 @@ def parse_tag_names(raw: str):
     return tags
 
 
+@api.route("/api/search")
+def api_search():
+    from sqlalchemy import or_
+
+    querystring = request.args.get("query", None)
+
+    if " " in querystring:
+        querytext = querystring.replace(" ", ",")
+    else:
+        querytext = querystring
+
+    page = request.args.get("page", None)
+    if page:
+        page = int(page)
+
+    current_app.logger.info("searching %s", querystring)
+
+    # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
+
+    query = Image.query.filter(or_(SearchPool.value.ilike(f"%{querystring}%"), SearchPool.value.match(querytext)))
+    query = query.join(SearchPool, Image.id == SearchPool.image_id)
+    query = query.distinct(SearchPool.image_id)
+
+    pagination = query.paginate(page=page, per_page=IMAGES_PER_PAGE)
+
+    return render_template("search.html", pagination=pagination, query=querystring)
+
+
 @api.route("/api/galleries")
 def api_galleries():
     from flask import jsonify
@@ -69,22 +98,24 @@ def api_gallery_image(gallery_id, image_id):
 @api.route("/api/gallery/<int:gallery_id>", methods=["PUT", "DELETE"])
 def api_gallery(gallery_id=None):
     if not gallery_id and request.method == "POST":
-        pass
+        db.session.add(create_gallery(request))
 
     else:
         gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
 
         if request.method == "PUT":
-            pass
+            update_gallery(gallery, request)
 
         elif request.method == "DELETE":
             db.session.delete(gallery)
 
-    db.session.commit()
+    try:
+        db.session.commit()
 
-    #flash("Gallery was deleted.", category="success")
+    except:
+        return {}, 500
 
-    #return redirect(url_for("site.view_index"))
+    return {}
 
 
 @api.route("/api/image", methods=["POST"])
@@ -97,16 +128,42 @@ def api_image(image_id=None):
         image = Image.query.filter_by(id=image_id).first_or_404()
 
         if request.method == "PUT":
-            pass
+            update_image(image, request)
 
         elif request.method == "DELETE":
             db.session.delete(image)
 
-    db.session.commit()
+    try:
+        db.session.commit()
 
-    #flash("Image was deleted.", category="success")
+    except:
+        return {}, 500
+    
+    return {}
 
-    #return redirect(url_for("site.view_index"))
+def create_gallery(request):
+    current_app.logger.info(request.form)
+
+    gallery = Gallery()
+    update_gallery(gallery, request)
+
+    tag_names = list(request.form.getlist('tag'))
+
+    query = Image.query.join(Tag, Tag.image_id == Image.id)
+    query = query.filter(Tag.name.in_(tag_names))
+
+    for image in query.all():
+        gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
+        gallery.images.append(gallery_image)
+
+    db.session.add(gallery)
+
+    return gallery
+
+
+def update_gallery(gallery, request):
+    gallery.name = request.form["galleryName"]
+    gallery.description = request.form["galleryDescription"]
 
 
 def create_image(request):
@@ -114,9 +171,7 @@ def create_image(request):
     raw = uploaded.read()
 
     if not raw:
-        pass
-        #flash("The uploaded file was invalid.", category="error")
-        #return render_template("upload.html")
+        raise Exception("The uploaded file was invalid.")
 
     image_id = get_hash_value(raw)
 
@@ -125,9 +180,7 @@ def create_image(request):
 
         # Check if uploaded image is jpeg using pillow
         if not is_image_allowed(pil_image):
-            pass
-            #flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
-            #return render_template("upload.html")
+            raise Exception("Image does not have the appropriate format. Only jpeg is allowed.")
 
         
         # If taken date was specified in the form, prefer it over exif data
@@ -176,3 +229,12 @@ def create_image(request):
 
 
         return image
+
+
+def update_image(image, request):
+    image.description = request.form["description"]
+
+    # parse tags according to rules e.g. split at ','; replace whitespace with '-'
+    new_tag_names = parse_tag_names(request.form["tags"])
+
+    image.update_tags(new_tag_names)
