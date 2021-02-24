@@ -50,8 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
             node.className = "dropdown-item";
             node.innerText = gallery.name;
             node.addEventListener("click", function (event) {
-                let url = `/api/gallery/${gallery.id}/add?image_id=${imageId}`;
+                let url = `/api/gallery/${gallery.id}/add/${imageId}`;
                 fetchBackground(url, function (response, statusCode) {
+                    console.log(response)
                     if (statusCode === 200) {
                         pushToast(`Image was added to gallery "${gallery.name}".`, "success");
                     } else {

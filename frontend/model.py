@@ -104,6 +104,11 @@ class GalleryImage(FlaskSerializeMixin, db.Model):
 
     image = db.relationship("Image", lazy=True)
 
+    def add_url(self):
+        return f"/api/gallery/{self.gallery_id}/add/{self.image_id}"
+
+    def delete_url(self):
+        return f"/api/gallery/{self.gallery_id}/remove/{self.image_id}"
 
 class SearchPool(db.Model):
     __tablename__ = "search_pool"

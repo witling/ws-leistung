@@ -91,7 +91,13 @@ def api_gallery_image(gallery_id, image_id):
         gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
         db.session.delete(gallery_image)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+
+    except:
+        return {}, 500
+
+    return {}
 
 
 @api.route("/api/gallery", methods=["POST"])

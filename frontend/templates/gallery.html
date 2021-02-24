@@ -96,7 +96,7 @@
     <div class="col">
         {{ image_card(gallery_image.image) }}
         <p class="gallery-image-buttons text-end">
-            <a class="btn btn-outline-danger" href="/api/gallery/{{ gallery.id }}/remove?image_id={{ gallery_image.image.id }}">
+            <a class="btn btn-outline-danger" href="{{ gallery_image.delete_url() }}">
                 Remove
                 <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
             </a>

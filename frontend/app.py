@@ -26,7 +26,6 @@ def create_app(config):
 
     database.init_app(app)
 
-
     @app.errorhandler(500)
     def view_500(e):
         return render_template("500.html"), 500
