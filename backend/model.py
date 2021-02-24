@@ -5,7 +5,7 @@ from typing import List
 from database import db
 
 
-class Image(db.Model):
+class Image(FlaskSerializeMixin, db.Model):
     __tablename__ = "images"
 
     id = db.Column(db.String(32), primary_key=True)
@@ -27,6 +27,8 @@ class Image(db.Model):
 
     # one-to-many relationship
     gallery_images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
+
+    exclude_serialize_fields = ["content"]
 
     def url(self, download=False):
         if download:

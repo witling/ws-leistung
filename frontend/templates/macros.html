@@ -30,7 +30,7 @@
     </div>
     <div class="card-footer">
         <small class="text-muted">Uploaded {{ image.added_date|dateformat }}</small><br>
-        {% if image.taken_date is not none %}
+        {% if image.taken_date %}
             <small class="text-muted">Created {{ image.taken_date|dateformat }}</small>
         {% endif %}
     </div>

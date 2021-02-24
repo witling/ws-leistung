@@ -10,6 +10,26 @@ site = Blueprint('site', __name__)
 
 IMAGES_PER_PAGE = 9
 
+class JsonPaginator:
+    def __init__(self, json):
+        def to_image(item):
+            item["added_date"] = datetime.strptime(item["added_date"], '%Y-%m-%d')
+
+            if item["taken_date"]:
+                item["taken_date"] = datetime.strptime(item["taken_date"], '%Y-%m-%d')
+
+            print(item)
+            return Image(**item)
+
+        self.page = json["page"]
+        self.items = map(to_image, json["results"])
+        self._start = json["start"]
+        self._end = json["end"]
+
+    def iter_pages(self):
+        return (i + 1 for i in range(self._end))
+
+
 def fetch_backend(route, flask_request=None, method='GET'):
     import requests
 
@@ -18,7 +38,7 @@ def fetch_backend(route, flask_request=None, method='GET'):
     current_app.logger.info(f"requesting backend url: {url}")
 
     if flask_request:
-        res = requests.request(method, url, data=flask_request.form, files=flask_request.files)
+        res = requests.request(method, url, params=flask_request.args, data=flask_request.form, files=flask_request.files)
     else:
         res = requests.request(method, url)
 
@@ -50,28 +70,9 @@ def view_upload():
 
 @site.route("/search")
 def view_search():
-    from sqlalchemy import or_
-
     querystring = request.args.get("query", None)
-
-    if " " in querystring:
-        querytext = querystring.replace(" ", ",")
-    else:
-        querytext = querystring
-
-    page = request.args.get("page", None)
-    if page:
-        page = int(page)
-
-    current_app.logger.info("searching %s", querystring)
-
-    # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#full-text-search
-
-    query = Image.query.filter(or_(SearchPool.value.ilike(f"%{querystring}%"), SearchPool.value.match(querytext)))
-    query = query.join(SearchPool, Image.id == SearchPool.image_id)
-    query = query.distinct(SearchPool.image_id)
-
-    pagination = query.paginate(page=page, per_page=IMAGES_PER_PAGE)
+    res = fetch_backend("/api/search", request)
+    pagination = JsonPaginator(res.json())
 
     return render_template("search.html", pagination=pagination, query=querystring)
 

@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 from io import BytesIO
 from PIL import Image as PilImage
@@ -7,6 +7,7 @@ from model import *
 
 THUMBNAIL_SIZE = (256, 256)
 EXIF_DATE_CREATED = 36867
+IMAGES_PER_PAGE = 9
 
 api = Blueprint('api', __name__)
 
@@ -54,7 +55,7 @@ def api_search():
     else:
         querytext = querystring
 
-    page = request.args.get("page", None)
+    page = request.args.get("page", 1)
     if page:
         page = int(page)
 
@@ -67,8 +68,12 @@ def api_search():
     query = query.distinct(SearchPool.image_id)
 
     pagination = query.paginate(page=page, per_page=IMAGES_PER_PAGE)
+    pages = list(pagination.iter_pages())
+    results = list(map(lambda item: item.as_dict, pagination.items))
+    end = pages[-1] if pages else 1
+    result = {"start": 1, "end": end, "page": page, "results": results}
 
-    return render_template("search.html", pagination=pagination, query=querystring)
+    return jsonify(result)
 
 
 @api.route("/api/galleries")
