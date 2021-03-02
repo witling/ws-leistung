@@ -72,9 +72,13 @@ def view_upload():
 def view_search():
     querystring = request.args.get("query", None)
     res = fetch_backend("/api/search", request)
-    pagination = JsonPaginator(res.json())
 
-    return render_template("search.html", pagination=pagination, query=querystring)
+    body = res.json()
+
+    date_filter = body.get("filter", None)
+    pagination = JsonPaginator(body)
+
+    return render_template("search.html", pagination=pagination, query=querystring, date_filter=date_filter)
 
 
 @site.route("/image/<string:image_id>", methods=["GET", "POST"])

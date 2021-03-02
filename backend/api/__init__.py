@@ -50,14 +50,16 @@ def api_search():
 
     querystring = request.args.get("query", None)
 
+    filter_date = request.args.get("filterDate", None)
+    filter_date_condition = request.args.get("filterDateCondition", None)
+
     if " " in querystring:
         querytext = querystring.replace(" ", ",")
     else:
         querytext = querystring
 
-    page = request.args.get("page", 1)
-    if page:
-        page = int(page)
+    page = request.args.get("page", 1, type=int)
+    result = {}
 
     current_app.logger.info("searching %s", querystring)
 
@@ -65,13 +67,17 @@ def api_search():
 
     query = Image.query.filter(or_(SearchPool.value.ilike(f"%{querystring}%"), SearchPool.value.match(querytext)))
     query = query.join(SearchPool, Image.id == SearchPool.image_id)
+
+    query = add_date_filter(query, filter_date, filter_date_condition, result)
+
     query = query.distinct(SearchPool.image_id)
 
     pagination = query.paginate(page=page, per_page=IMAGES_PER_PAGE)
     pages = list(pagination.iter_pages())
-    results = list(map(lambda item: item.as_dict, pagination.items))
-    end = pages[-1] if pages else 1
-    result = {"start": 1, "end": end, "page": page, "results": results}
+    result["results"] = list(map(lambda item: item.as_dict, pagination.items))
+    result["start"] = 1
+    result["end"] = pages[-1] if pages else 1
+    result["page"] = page
 
     return jsonify(result)
 
@@ -250,3 +256,26 @@ def update_image(image, request):
     new_tag_names = parse_tag_names(request.form["tags"])
 
     image.update_tags(new_tag_names)
+
+
+def add_date_filter(query, date, condition, result):
+    if date and condition:
+        if condition == "before":
+            query = query.filter(date < Image.taken_date)
+
+        elif condition == "on":
+            query = query.filter(date == Image.taken_date)
+
+        elif condition == "after":
+            query = query.filter(Image.taken_date < date)
+
+        else:
+            return query
+
+        # return date filter in result
+        result["filter"] = {
+            "date": date,
+            "condition": condition,
+        }
+
+    return query
