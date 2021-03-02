@@ -12,28 +12,28 @@ CREATE TABLE images (
 );
 
 CREATE TABLE thumbnails (
-    id CHAR(64),
+    image_id CHAR(64),
     content BYTEA NOT NULL,
 
-    PRIMARY KEY(id),
-    CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
+    PRIMARY KEY(image_id),
+    CONSTRAINT fk_image FOREIGN KEY(image_id) REFERENCES images(id)
 );
 
 CREATE TABLE metadata (
-    id CHAR(64),
+    image_id CHAR(64),
     key INT NOT NULL,
     value TEXT NOT NULL,
 
-    PRIMARY KEY(id, key),
-    CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
+    PRIMARY KEY(image_id, key),
+    CONSTRAINT fk_image FOREIGN KEY(image_id) REFERENCES images(id)
 );
 
 CREATE TABLE tags (
-    id CHAR(64) NOT NULL,
+    image_id CHAR(64) NOT NULL,
     name VARCHAR(32) NOT NULL,
 
-    PRIMARY KEY(id, name),
-    CONSTRAINT fk_image FOREIGN KEY(id) REFERENCES images(id)
+    PRIMARY KEY(image_id, name),
+    CONSTRAINT fk_image FOREIGN KEY(image_id) REFERENCES images(id)
 );
 
 CREATE TABLE galleries (
@@ -56,4 +56,4 @@ CREATE TABLE galleries_images (
 
 CREATE VIEW search_pool AS
         SELECT id AS image_id, description AS value FROM images
-UNION   SELECT id AS image_id, name AS value FROM tags;
+UNION   SELECT image_id, name AS value FROM tags;

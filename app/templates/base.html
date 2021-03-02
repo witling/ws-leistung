@@ -43,7 +43,9 @@
                         <div class="input-group">
                             <input aria-label="Search" class="form-control me-2" id="searchbar" name="query"
                                    placeholder="Search"
-                                   type="search">
+                                   type="search"
+                                   value="{% if query %}{{ query }}{% endif %}"
+                                   >
                             <button class="btn btn-outline-primary" type="submit">Search</button>
                         </div>
                     </form>

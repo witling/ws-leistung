@@ -18,9 +18,11 @@
     <label class="form-label mt-2">Include images with tags</label><br>
     {% for tag in tags %}
     <div class="form-check form-check-inline">
-      <input class="form-check-input" type="checkbox" id="{{tag.id}}" value="{{tag.id}}">
-      <label class="form-check-label" for="{{tag.id}}">{{tag.name}}</label>
+      <input class="form-check-input" type="checkbox" id="{{tag.name}}" value="{{tag.name}}" name="tag">
+      <label class="form-check-label" for="{{tag.name}}">{{tag.name}}</label>
     </div>
+    {% else %}
+    <i>No tags yet...</i>
     {% endfor %}
     <br>
 

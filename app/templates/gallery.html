@@ -23,11 +23,6 @@
     </div>
 
     <div class="container-fluid" id="gallery-actions-bar">
-        <!--a class="btn btn-primary" href="/api/gallery/{{ gallery.id }}/export">
-            <img src="{{ url_for('static', filename='arrowdown.png') }}" height="16" width="16">
-            Export
-        </a-->
-
         {% if edit %}
         <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDiscardModal">
             <img height="16" src="{{ url_for('static', filename='cross.png') }}" width="16">
@@ -55,7 +50,7 @@
         {{
             render_confirm(
                 "galleryDeleteModal",
-                "/gallery/" ~ gallery.id ~ "/delete",
+                "/api/gallery/" ~ gallery.id ~ "/delete",
                 "Delete gallery?",
                 "Do you really want to delete the gallery '" ~ gallery.name ~ "'?"
             )
@@ -76,7 +71,7 @@
 
         {% for gallery_image in pagination.items %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
-                <img src="/api/image/{{ gallery_image.image.id }}" class="d-block m-auto" alt="{{ gallery_image.image.description }}">
+                <img src="{{ gallery_image.image.url() }}" class="d-block m-auto" alt="{{ gallery_image.image.description }}">
                 <div class="carousel-caption d-none d-md-block">
                     <p>{{ gallery_image.image.description }}</p>
                 </div>

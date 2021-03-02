@@ -25,6 +25,19 @@ class Image(db.Model):
     # one-to-many relationship
     tags = db.relationship("Tag", lazy=True, cascade="save-update, merge, delete, delete-orphan")
 
+    # one-to-many relationship
+    gallery_images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
+
+    def url(self, download=False):
+        if download:
+            return '/api/image/{}?download=1'.format(self.id)
+        return '/api/image/{}'.format(self.id)
+
+    def thumbnail_url(self, download=False):
+        if download:
+            return '/api/image/{}?thumbnail=1&download=1'.format(self.id)
+        return '/api/image/{}?thumbnail=1'.format(self.id)
+
     def tags_to_str(self):
         return ', '.join(map(lambda tag: tag.name, self.tags))
 
@@ -49,14 +62,14 @@ class Image(db.Model):
 class Thumbnail(db.Model):
     __tablename__ = "thumbnails"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     content = db.Column(db.LargeBinary)
 
 
 class Metadata(db.Model):
     __tablename__ = "metadata"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     key = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(255))
 
@@ -64,7 +77,7 @@ class Metadata(db.Model):
 class Tag(db.Model):
     __tablename__ = "tags"
 
-    id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
     name = db.Column(db.String(16), primary_key=True)
 
 
@@ -78,6 +91,10 @@ class Gallery(FlaskSerializeMixin, db.Model):
 
     images = db.relationship("GalleryImage", lazy=True, cascade="all, delete")
 
+    def preview_images(self):
+        query = Image.query.join(GalleryImage).filter_by(gallery_id=self.id).limit(3)
+        return query.all()
+
 
 class GalleryImage(FlaskSerializeMixin, db.Model):
     __tablename__ = "galleries_images"
@@ -86,3 +103,10 @@ class GalleryImage(FlaskSerializeMixin, db.Model):
     image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
 
     image = db.relationship("Image", lazy=True)
+
+
+class SearchPool(db.Model):
+    __tablename__ = "search_pool"
+
+    image_id = db.Column(db.String(32), primary_key=True)
+    value = db.Column(db.String(), primary_key=True)
