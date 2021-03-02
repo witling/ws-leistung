@@ -8,63 +8,73 @@
 
 {{ render_messages() }}
 
-<img alt="{{ image.description }}" class="img-fluid d-block mx-auto" src="{{ image.url() }}">
+<div id="image-view">
+    <img alt="{{ image.description }}" class="img-fluid d-block mx-auto" src="{{ image.url() }}">
+</div>
 
 <form action="{{ url_for(request.endpoint, image_id=image.id) }}" class="mx-5" method="POST">
     <input id="imageId" name="imageId" type="hidden" value="{{ image.id }}">
 
     <div class="container-fluid" id="image-actions-bar">
-        <div class="btn-group">
-            <a class="btn btn-primary" href="{{ image.url(download=True) }}">Download</a>
+        <div class="row">
+            <div class="col-auto">
+                <div class="btn-group">
+                    <a class="btn btn-primary" href="{{ image.url(download=True) }}">Download</a>
 
-            <a class="btn btn-outline-primary" href="{{ image.thumbnail_url(download=True) }}">Download
-                Thumbnail</a>
-
-            <div class="dropdown">
-                <button aria-expanded="false" aria-haspopup="true"
-                        class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" href="#" id="galleryDropdownOpen">
-                    <img height="16" src="{{ url_for('static', filename='plus.png') }}" width="16">
-                    Gallery
-                </button>
-                <div aria-labelledby="galleryDropdownOpen" class="dropdown-menu" id="galleryDropdownSelect">
+                    <a class="btn btn-outline-primary" href="{{ image.thumbnail_url(download=True) }}">Download
+                        Thumbnail</a>
                 </div>
             </div>
 
-            {% if edit %}
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDeleteModal">
-                <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
-            </button>
-            {{
-                render_confirm(
-                    "imageDeleteModal",
-                    "/api/image/" ~ image.id ~ "/delete",
-                    "Delete image?",
-                    "Do you really want to delete this image?"
-                )
-            }}
-            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDiscardModal">
-                <img height="16" src="{{ url_for('static', filename='cross.png') }}" width="16">
-            </button>
-            {{
-                render_discard(
-                    "imageDiscardModal",
-                    "/image/" ~ image.id,
-                    "Discard changes?"
-                )
-            }}
-            <button class="btn btn-outline-primary" type="submit">
-                <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
-            </button>
-            {% else %}
-            <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}">
-                <img height="16" src="{{ url_for('static', filename='edit.png') }}"
-                     width="16">
-            </a>
-            {% endif %}
+            <div class="col-auto">
+                <div class="dropdown">
+                    <button aria-expanded="false" aria-haspopup="true"
+                            class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" href="#" id="galleryDropdownOpen">
+                        <img height="16" src="{{ url_for('static', filename='plus.png') }}" width="16">
+                        Gallery
+                    </button>
+                    <div aria-labelledby="galleryDropdownOpen" class="dropdown-menu" id="galleryDropdownSelect">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-auto">
+                {% if edit %}
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#imageDeleteModal">
+                    <img height="16" src="{{ url_for('static', filename='trash.png') }}" width="16">
+                </button>
+                {{
+                    render_confirm(
+                        "imageDeleteModal",
+                        "/api/image/" ~ image.id ~ "/delete",
+                        "Delete image?",
+                        "Do you really want to delete this image?"
+                    )
+                }}
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#imageDiscardModal">
+                    <img height="16" src="{{ url_for('static', filename='cross.png') }}" width="16">
+                </button>
+                {{
+                    render_discard(
+                        "imageDiscardModal",
+                        "/image/" ~ image.id,
+                        "Discard changes?"
+                    )
+                }}
+                <button class="btn btn-outline-primary" type="submit">
+                    <img height="16" src="{{ url_for('static', filename='checked.png') }}" width="16">
+                </button>
+                {% else %}
+                <a class="btn btn-outline-primary" href="{{ url_for(request.endpoint, image_id=image.id, edit=1) }}">
+                    <img height="16" src="{{ url_for('static', filename='edit.png') }}"
+                         width="16">
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <div class="container-fluid">
+    <div id="image-information" class="container-fluid">
         <p>{{ image.width }} x {{ image.height }}</p>
 
         {% if edit %}

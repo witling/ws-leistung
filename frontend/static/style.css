@@ -8,16 +8,25 @@
     padding-top: 30px;
 }
 
-#image-actions-bar {
+#image-actions-bar,
+#image-information,
+#gallery-actions-bar,
+#gallery-carousel
+{
     padding: 10px;
 }
 
-#gallery-carousel {
-    padding: 10px;
+#image-information {
+    margin-bottom: 10px;
 }
 
-#gallery-carousel {
-    padding: 10px;
+#image-view {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#collapseMetadata {
+    overflow-x: scroll;
 }
 
 .gallery-image-buttons {
@@ -32,4 +41,22 @@
 
 .d-block {
     height: 30vh;
+}
+
+.form-label {
+    margin-top: 15px;
+}
+
+.form-select {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+.form-text {
+    font-size: 0.7em !important;
+}
+
+#footer {
+    padding: 50px;
+    text-align: center;
 }
