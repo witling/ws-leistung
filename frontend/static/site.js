@@ -40,9 +40,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addGalleries(response) {
         console.log(response.status);
+
         let galleries = JSON.parse(response);
         let galleryDropdownSelect = document.getElementById("galleryDropdownSelect");
         let imageId = document.getElementById("imageId").value;
+
+        if (galleries.length === 0) {
+            let node = document.createElement("span");
+
+            node.style = "padding: 5px; padding-left: 10px;"
+            node.innerHTML = "<i>No galleries...</i>";
+
+            galleryDropdownSelect.appendChild(node);
+        }
+
         for (let gallery of galleries) {
             let node = document.createElement("button");
 
@@ -50,8 +61,9 @@ document.addEventListener("DOMContentLoaded", function () {
             node.className = "dropdown-item";
             node.innerText = gallery.name;
             node.addEventListener("click", function (event) {
-                let url = `/api/gallery/${gallery.id}/add?image_id=${imageId}`;
+                let url = `/api/gallery/${gallery.id}/add/${imageId}`;
                 fetchBackground(url, function (response, statusCode) {
+                    console.log(response)
                     if (statusCode === 200) {
                         pushToast(`Image was added to gallery "${gallery.name}".`, "success");
                     } else {

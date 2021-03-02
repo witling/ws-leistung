@@ -1,4 +1,5 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from werkzeug.exceptions import BadRequest
 from io import BytesIO
 from PIL import Image as PilImage
 
@@ -6,6 +7,24 @@ from model import *
 
 
 api = Blueprint('api', __name__)
+
+
+def fetch_backend(route, flask_request=None, method='GET'):
+    import requests
+
+    url = f"http://backend:5000{route}"
+
+    current_app.logger.info(f"requesting backend url: {url}")
+
+    if flask_request:
+        res = requests.request(method, url, data=flask_request.form, files=flask_request.files)
+    else:
+        res = requests.request(method, url)
+
+    if res.status_code != 200:
+        raise HTTPException(res.status_code)
+
+    return res
 
 
 @api.route("/api/galleries")
@@ -17,37 +36,35 @@ def api_galleries():
     return jsonify(list(map(lambda gallery: gallery.as_dict, galleries)))
 
 
-@api.route("/api/gallery/<int:gallery_id>/add")
-def api_gallery_add_image(gallery_id):
-    image_id = request.args["image_id"]
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+@api.route("/api/gallery/<int:gallery_id>/add/<string:image_id>")
+def api_gallery_add_image(gallery_id, image_id):
+    try:
+        fetch_backend(f"/api/gallery/{gallery_id}/{image_id}", method="POST")
 
-    gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
-    gallery.images.append(gallery_image)
+        flash("Image was added to gallery.", category="success");
 
-    db.session.commit()
+        return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
 
-    return {}
+    except:
+        return {}, 500
 
 
-@api.route("/api/gallery/<int:gallery_id>/remove")
-def api_gallery_remove_image(gallery_id):
-    image_id = request.args["image_id"]
+@api.route("/api/gallery/<int:gallery_id>/remove/<string:image_id>")
+def api_gallery_remove_image(gallery_id, image_id):
+    try:
+        fetch_backend(f"/api/gallery/{gallery_id}/{image_id}", method="DELETE")
 
-    gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
-    db.session.delete(gallery_image)
-    db.session.commit()
+        flash("Image was removed from gallery.", category="success");
 
-    flash("Image was removed from gallery.", category="success");
+        return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
 
-    return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
+    except:
+        return {}, 500
 
 
 @api.route("/api/gallery/<int:gallery_id>/delete")
 def api_gallery_delete(gallery_id):
-    gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-    db.session.delete(gallery)
-    db.session.commit()
+    fetch_backend(f"/api/gallery/{gallery_id}", request, method="DELETE")
 
     flash("Gallery was deleted.", category="success")
 
@@ -80,14 +97,10 @@ def api_image(image_id):
 
     return response
 
-
 @api.route("/api/image/<string:image_id>/delete")
 def api_image_delete(image_id):
-    image = Image.query.filter_by(id=image_id).first_or_404()
-    db.session.delete(image)
-    db.session.commit()
+    fetch_backend(f"/api/image/{image_id}", request, method="DELETE")
 
     flash("Image was deleted.", category="success")
 
     return redirect(url_for("site.view_index"))
-

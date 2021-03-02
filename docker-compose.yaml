@@ -13,7 +13,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/pgdata
 
-  app:
+  frontend:
     restart: always
     build:
       context: .
@@ -25,7 +25,25 @@ services:
       - SQLALCHEMY_DATABASE_URI=postgresql://achim:passw0rd@db/datenbank
     tty: true
     volumes:
-      - ./app:/app
+      - ./common:/common
+      - ./frontend:/app
+    depends_on:
+      - db
+
+  backend:
+    restart: always
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    environment:
+      - FLASK_APP=/app/app.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SQLALCHEMY_DATABASE_URI=postgresql://achim:passw0rd@db/datenbank
+    tty: true
+    volumes:
+      - ./common:/common
+      - ./backend:/app
     depends_on:
       - db
 
@@ -34,7 +52,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - app
+      - frontend
     ports:
       - "4000:4000"
 

@@ -1,0 +1,61 @@
+{% from "macros.html" import image_card, render_pagination %}
+
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+
+<h2>Search results for "{{query}}" ...</h2>
+
+<!-- date filter -->
+<form action="/search" method="GET" class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="col-12">
+        <input aria-label="Search" class="form-control me-2" id="searchbar" name="query"
+            placeholder="Search"
+            type="hidden"
+            value="{% if query %}{{ query }}{% endif %}"
+            >
+    </div>
+    <div class="col-12">
+        {% set condition_selected = 1 %}
+        {% if date_filter %}
+            {% if date_filter.condition == "before" %}
+                {% set condition_selected = 2 %}
+            {% elif date_filter.condition == "on" %}
+                {% set condition_selected = 3 %}
+            {% elif date_filter.condition == "after" %}
+                {% set condition_selected = 4 %}
+            {% endif %}
+        {% endif %}
+
+        <select class="form-select" aria-label="Date filter" name="filterDateCondition">
+            <option {% if condition_selected == 1 %}selected{% endif %}>Filter by</option>
+            <option {% if condition_selected == 2 %}selected{% endif %} value="before">Before</option>
+            <option {% if condition_selected == 3 %}selected{% endif %} value="on">On</option>
+            <option {% if condition_selected == 4 %}selected{% endif %} value="after">After</option>
+        </select>
+    </div>
+    <div class="col-12">
+        <input type="date" name="filterDate" value="{% if date_filter %}{{ date_filter.date }}{% endif %}">
+    </div>
+    <div class="col-12">
+        <button class="btn btn-outline-primary btn-sm" type="submit">Filter</button>
+    </div>
+</form>
+
+<hr>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for image in pagination.items %}
+    <div class="col">
+        {{ image_card(image) }}
+    </div>
+    {% else %}
+        <h2>Nothing found...</h2>
+    {% endfor %}
+</div>
+
+{{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
+
+{% endblock %}

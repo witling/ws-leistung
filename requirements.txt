@@ -1,5 +1,6 @@
 Flask
-Flask-SQLAlchemy
 flask-serialize
+Flask-SQLAlchemy
 psycopg2-binary
 Pillow
+requests

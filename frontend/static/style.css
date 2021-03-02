@@ -1,0 +1,62 @@
+.nav-item {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#paginator {
+    padding: 10px;
+    padding-top: 30px;
+}
+
+#image-actions-bar,
+#image-information,
+#gallery-actions-bar,
+#gallery-carousel
+{
+    padding: 10px;
+}
+
+#image-information {
+    margin-bottom: 10px;
+}
+
+#image-view {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#collapseMetadata {
+    overflow-x: scroll;
+}
+
+.gallery-image-buttons {
+    padding: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#custom-alerts-container {
+    z-index: 3;
+}
+
+.d-block {
+    height: 30vh;
+}
+
+.form-label {
+    margin-top: 15px;
+}
+
+.form-select {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+.form-text {
+    font-size: 0.7em !important;
+}
+
+#footer {
+    padding: 50px;
+    text-align: center;
+}
