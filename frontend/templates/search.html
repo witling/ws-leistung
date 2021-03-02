@@ -56,6 +56,6 @@
     {% endfor %}
 </div>
 
-{{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
+{{ render_pagination(pagination, request.endpoint, query=url_query) }}
 
 {% endblock %}
