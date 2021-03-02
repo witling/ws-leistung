@@ -8,6 +8,31 @@
 
 <h2>Search results for "{{query}}" ...</h2>
 
+<!-- date filter -->
+<form action="/search" method="GET" class="row row-cols-lg-auto g-3 align-items-center">
+    <div class="col-12">
+        <input aria-label="Search" class="form-control me-2" id="searchbar" name="query"
+            placeholder="Search"
+            type="hidden"
+            value="{% if query %}{{ query }}{% endif %}"
+            >
+    </div>
+    <div class="col-12">
+        <select class="form-select" aria-label="Date filter">
+            <option selected>Filter by</option>
+            <option value="before">Before</option>
+            <option value="on">On</option>
+            <option value="after">After</option>
+        </select>
+    </div>
+    <div class="col-12">
+        <input type="date" name="takenDate">
+    </div>
+    <div class="col-12">
+        <button class="btn btn-outline-primary btn-sm" type="submit">Filter</button>
+    </div>
+</form>
+
 <hr>
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
