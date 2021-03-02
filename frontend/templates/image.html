@@ -75,27 +75,28 @@
     </div>
 
     <div id="image-information" class="container-fluid">
-        <p>{{ image.width }} x {{ image.height }}</p>
+        <div class="mb-3">
+            <label for="dimension" class="form-label">Dimension</label>
+            <input type="text" id="dimension" class="form-control" value="{{ image.width }} x {{ image.height }}" disabled>
+        </div>
 
-        {% if edit %}
-        <label class="form-label" for="description">Description</label>
-        <textarea class="form-control" name="description">{{ image.description }}</textarea>
-        <label class="form-label" for="tags">Tags</label>
-        <input class="form-control" type="text" name="tags" value="{{ image.tags_to_str() }}">
-        <div class="form-text">Separate tags by comma. Whitespace will be replaced by dash.</div>
-        {% else %}
-            <div class="d-flex p-2">
-                {% for tag in image.tags %}
-                    {{ render_tag(tag) }}
-                {% endfor %}
-            </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" name="description" {% if not edit %}disabled{% endif %}>{{ image.description }}</textarea>
+        </div>
 
-            {% if image.description %}
-                <p>{{ image.description }}</p>
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags</label>
+            {% if edit %}
+                <input class="form-control" type="text" name="tags" value="{{ image.tags_to_str() }}">
             {% else %}
-                <p><i>No description.</i></p>
+                <div class="d-flex">
+                    {% for tag in image.tags %}
+                        {{ render_tag(tag) }}
+                    {% endfor %}
+                </div>
             {% endif %}
-        {% endif %}
+        </div>
     </div>
 
     <p>
