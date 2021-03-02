@@ -74,7 +74,6 @@ def view_upload():
             if not is_image_allowed(pil_image):
                 flash("Image does not have the appropriate format. Only jpeg is allowed.", category="error")
                 return render_template("upload.html")
-
             
             # If taken date was specified in the form, prefer it over exif data
             taken_date_str = request.form.get("takenDate")
