@@ -1,15 +1,12 @@
 import os
 
-import database
+from common.fmt import dateformat
+from common import database
 
-from flask import current_app, flash, Flask, render_template, request
+from flask import Blueprint, current_app, flash, Flask, render_template, request
 
 from .api import api
-from .fmt import dateformat
 from .site import site
-
-
-from flask import Blueprint
 
 def create_app(config):
     app = Flask(__name__)

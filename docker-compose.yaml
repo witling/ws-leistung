@@ -25,6 +25,7 @@ services:
       - SQLALCHEMY_DATABASE_URI=postgresql://achim:passw0rd@db/datenbank
     tty: true
     volumes:
+      - ./common:/common
       - ./frontend:/app
     depends_on:
       - db
@@ -41,6 +42,7 @@ services:
       - SQLALCHEMY_DATABASE_URI=postgresql://achim:passw0rd@db/datenbank
     tty: true
     volumes:
+      - ./common:/common
       - ./backend:/app
     depends_on:
       - db
