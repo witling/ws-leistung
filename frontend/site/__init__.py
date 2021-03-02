@@ -79,15 +79,15 @@ def view_search():
     pagination = JsonPaginator(body)
 
     # keep query params for pagination
-    url_params = ["query=" + querystring]
+    url_query = ["query=" + querystring]
 
     if date_filter:
-        url_params.append("filterDate=" + date_filter["date"])
-        url_params.append("filterDateCondition=" + date_filter["condition"])
+        url_query.append("filterDate=" + date_filter["date"])
+        url_query.append("filterDateCondition=" + date_filter["condition"])
 
-    url_params = '&'.join(url_params)
+    url_query = '&'.join(url_query)
 
-    return render_template("search.html", pagination=pagination, query=querystring, date_filter=date_filter, url_params=url_params)
+    return render_template("search.html", pagination=pagination, query=querystring, date_filter=date_filter, url_query=url_query)
 
 
 @site.route("/image/<string:image_id>", methods=["GET", "POST"])

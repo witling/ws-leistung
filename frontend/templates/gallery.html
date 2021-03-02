@@ -105,6 +105,6 @@
     {% endfor %}
 </div>
 
-{{ render_pagination(pagination) }}
+{{ render_pagination(pagination, request.endpoint, url_params={"gallery_id": gallery.id}) }}
 
 {% endblock %}
