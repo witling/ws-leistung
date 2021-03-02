@@ -15,7 +15,6 @@
 ./example/being-complicated.jpg;;2021-02-12;meme,programming
 ./example/old-church.jpg;nice church (or something);2019-08-08;house,exif
 ./example/park.jpg;nice park;2020-04-05;exif
-./example/being-complicated.jpg;;2020-03-02;meme,programming
 ./example/eclipse-intellij.jpg;intellij > eclipse;;meme,programming
 ./example/emacs.jpg;vim > emacs;;meme,programming
 ./example/fixing-in-production.jpg;efficient;2020-06-25;meme,programming

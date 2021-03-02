@@ -101,10 +101,16 @@ class Gallery(FlaskSerializeMixin, db.Model):
 class GalleryImage(FlaskSerializeMixin, db.Model):
     __tablename__ = "galleries_images"
 
-    gallery_id = db.Column(db.Integer, db.ForeignKey("galleries.id"), primary_key=True)
-    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True)
+    gallery_id = db.Column(db.Integer, db.ForeignKey("galleries.id"), primary_key=True, unique=True)
+    image_id = db.Column(db.String(32), db.ForeignKey("images.id"), primary_key=True, unique=False)
 
     image = db.relationship("Image", lazy=True)
+
+    def add_url(self):
+        return f"/api/gallery/{self.gallery_id}/add/{self.image_id}"
+
+    def delete_url(self):
+        return f"/api/gallery/{self.gallery_id}/remove/{self.image_id}"
 
 
 class SearchPool(db.Model):

@@ -44,6 +44,11 @@ def parse_tag_names(raw: str):
     return tags
 
 
+def handle_exception(e):
+    db.session.rollback()
+    current_app.logger.error(e)
+    return {}, 500
+
 @api.route("/api/search")
 def api_search():
     from sqlalchemy import or_
@@ -93,20 +98,20 @@ def api_galleries():
 
 @api.route("/api/gallery/<int:gallery_id>/<string:image_id>", methods=["POST", "DELETE"])
 def api_gallery_image(gallery_id, image_id):
-    if request.method == "POST":
-        gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-        gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
-        gallery.images.append(gallery_image)
-
-    elif request.method == "DELETE":
-        gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
-        db.session.delete(gallery_image)
-
     try:
+        if request.method == "POST":
+            gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+            gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+            gallery.images.append(gallery_image)
+
+        elif request.method == "DELETE":
+            gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
+            db.session.delete(gallery_image)
+
         db.session.commit()
 
-    except:
-        return {}, 500
+    except Exception as e:
+        return handle_exception(e)
 
     return {}
 
@@ -114,23 +119,23 @@ def api_gallery_image(gallery_id, image_id):
 @api.route("/api/gallery", methods=["POST"])
 @api.route("/api/gallery/<int:gallery_id>", methods=["PUT", "DELETE"])
 def api_gallery(gallery_id=None):
-    if not gallery_id and request.method == "POST":
-        db.session.add(create_gallery(request))
-
-    else:
-        gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-
-        if request.method == "PUT":
-            update_gallery(gallery, request)
-
-        elif request.method == "DELETE":
-            db.session.delete(gallery)
-
     try:
+        if not gallery_id and request.method == "POST":
+            db.session.add(create_gallery(request))
+
+        else:
+            gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+
+            if request.method == "PUT":
+                update_gallery(gallery, request)
+
+            elif request.method == "DELETE":
+                db.session.delete(gallery)
+
         db.session.commit()
 
-    except:
-        return {}, 500
+    except Exception as e:
+        return handle_exception(e)
 
     return {}
 
@@ -138,28 +143,30 @@ def api_gallery(gallery_id=None):
 @api.route("/api/image", methods=["POST"])
 @api.route("/api/image/<string:image_id>", methods=["PUT", "DELETE"])
 def api_image(image_id=None):
-    if not image_id and request.method == "POST":
-        db.session.add(create_image(request))
-
-    else:
-        image = Image.query.filter_by(id=image_id).first_or_404()
-
-        if request.method == "PUT":
-            update_image(image, request)
-
-        elif request.method == "DELETE":
-            db.session.delete(image)
-
     try:
+        if not image_id and request.method == "POST":
+            db.session.add(create_image(request))
+
+        else:
+            image = Image.query.filter_by(id=image_id).first_or_404()
+
+            if request.method == "PUT":
+                update_image(image, request)
+
+            elif request.method == "DELETE":
+                db.session.delete(image)
+
         db.session.commit()
 
-    except:
-        return {}, 500
+    except Exception as e:
+        return handle_exception(e)
     
     return {}
 
 
 def create_gallery(request):
+    from sqlalchemy.orm import load_only
+
     current_app.logger.info(request.form)
 
     gallery = Gallery()
@@ -167,14 +174,13 @@ def create_gallery(request):
 
     tag_names = list(request.form.getlist('tag'))
 
-    query = Image.query.join(Tag, Tag.image_id == Image.id)
+    query = Image.query.join(Tag, Tag.image_id == Image.id).options(load_only("id"))
     query = query.filter(Tag.name.in_(tag_names))
+    print(query)
 
     for image in query.all():
-        gallery_image = GalleryImage(image_id=image.id, gallery_id=gallery.id)
+        gallery_image = GalleryImage(gallery_id=gallery.id, image_id=image.id)
         gallery.images.append(gallery_image)
-
-    db.session.add(gallery)
 
     return gallery
 
@@ -244,7 +250,6 @@ def create_image(request):
 
             except UnicodeDecodeError:
                 current_app.logger.warning("cannot decode value for key %d", key)
-
 
         return image
 
