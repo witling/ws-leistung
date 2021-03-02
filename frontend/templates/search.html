@@ -54,7 +54,6 @@
     {% endfor %}
 </div>
 
-{% set url_params = "query=" ~ query %}
 {{ render_pagination(pagination, request.endpoint, url_params=url_params) }}
 
 {% endblock %}

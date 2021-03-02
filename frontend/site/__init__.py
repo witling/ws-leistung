@@ -78,7 +78,16 @@ def view_search():
     date_filter = body.get("filter", None)
     pagination = JsonPaginator(body)
 
-    return render_template("search.html", pagination=pagination, query=querystring, date_filter=date_filter)
+    # keep query params for pagination
+    url_params = ["query=" + querystring]
+
+    if date_filter:
+        url_params.append("filterDate=" + date_filter["date"])
+        url_params.append("filterDateCondition=" + date_filter["condition"])
+
+    url_params = '&'.join(url_params)
+
+    return render_template("search.html", pagination=pagination, query=querystring, date_filter=date_filter, url_params=url_params)
 
 
 @site.route("/image/<string:image_id>", methods=["GET", "POST"])

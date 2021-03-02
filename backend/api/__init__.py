@@ -261,13 +261,13 @@ def update_image(image, request):
 def add_date_filter(query, date, condition, result):
     if date and condition:
         if condition == "before":
-            query = query.filter(date < Image.taken_date)
+            query = query.filter(Image.taken_date < date)
 
         elif condition == "on":
             query = query.filter(date == Image.taken_date)
 
         elif condition == "after":
-            query = query.filter(Image.taken_date < date)
+            query = query.filter(date < Image.taken_date)
 
         else:
             return query
