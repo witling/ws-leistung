@@ -29,7 +29,7 @@
         <p class="card-text">{{ image.description }}</p>
     </div>
     <div class="card-footer">
-        <small class="text-muted">Uploaded  on {{ image.added_date|dateformat }}</small><br>
+        <small class="text-muted">Uploaded on {{ image.added_date|dateformat }}</small><br>
         {% if image.taken_date %}
             <small class="text-muted">Taken on {{ image.taken_date|dateformat }}</small>
         {% endif %}
