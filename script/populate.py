@@ -59,8 +59,12 @@ def upload(image):
 
 
 def main():
-    for image in read_images("./example-data.csv"):
-        upload(image)
+    try:
+        for image in read_images("./example-data.csv"):
+            upload(image)
+
+    except requests.exceptions.ConnectionError:
+        print("ERROR: connection to image service failed. is it running?")
 
 
 if __name__ == "__main__":

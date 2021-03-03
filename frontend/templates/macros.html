@@ -39,7 +39,9 @@
 
 
 {% macro render_tag(tag) %}
-<div class="btn btn-outline-secondary" style="padding:3px;margin:5px;">{{ tag.name }}</div>
+<a href="/search?query={{ tag.name|urlencode }}">
+    <div class="btn btn-outline-secondary" style="padding:3px;margin:5px;">{{ tag.name }}</div>
+</a>
 {% endmacro %}
 
 
