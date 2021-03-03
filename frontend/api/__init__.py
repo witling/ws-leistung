@@ -7,6 +7,20 @@ from common.model import *
 
 api = Blueprint('api', __name__)
 
+@api.route("/api/toggle-darkmode")
+def api_toggle_darkmode():
+    from flask import make_response
+
+    DARKMODE_COOKIE = "darkmode"
+
+    current = request.cookies.get(DARKMODE_COOKIE)
+    res = make_response()
+
+    # toggle darkmode
+    res.set_cookie(DARKMODE_COOKIE, '' if current else '1', secure=False, samesite="Lax")
+
+    return res
+
 
 @api.route("/api/galleries")
 def api_galleries():

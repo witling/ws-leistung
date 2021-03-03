@@ -131,10 +131,19 @@ document.addEventListener("DOMContentLoaded", function () {
         toast.show();
     }
 
+    function change_darkmode(e) {
+        fetchBackground("/api/toggle-darkmode", function (_, statusCode) {
+            if (statusCode === 200) {
+                location.reload();
+            }
+        });
+    }
+
     let galleryDropdownOpen = document.getElementById("galleryDropdownOpen");
     if (galleryDropdownOpen !== null) {
         fetchBackground("/api/galleries", addGalleries);
     }
 
     document.getElementById("searchform").addEventListener("submit", validate);
+    document.getElementById("dark-mode-switch").addEventListener("click", change_darkmode);
 });
