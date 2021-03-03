@@ -1,6 +1,18 @@
 #!/usr/bin/python3
 
+import requests
+
 UPLOAD_URL = "http://localhost:4000/upload"
+
+def download_image(url):
+    print("downloading", url, "...")
+    return requests.get(url).content
+
+
+def read_image_data(path):
+    with open(str(path), 'rb') as image_blob:
+        return image_blob.read()
+
 
 def read_images(csv):
     from pathlib import Path
@@ -20,11 +32,13 @@ def read_images(csv):
             image["taken_date"] = parts[2]
             image["tags"] = parts[3]
 
-            image_path = path.parent / parts[0]
+            if parts[0].startswith("http://") or parts[0].startswith("https://"):
+                image["content"] = download_image(parts[0])
 
-            with open(str(image_path), 'rb') as image_blob:
-                image["content"] = image_blob.read()
-            
+            else:
+                image_path = path.parent / parts[0]
+                image["content"] = read_image_data(image_path)
+
             images.append(image)
 
 
@@ -32,8 +46,6 @@ def read_images(csv):
 
 
 def upload(image):
-    import requests
-
     form = {
         "takenDate": image["taken_date"],
         "description": image["description"],

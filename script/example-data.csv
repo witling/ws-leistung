@@ -13,8 +13,8 @@
 ./example/wood-shelter.jpg;nice house in the woods;2020-12-24;house
 ./example/wtf-is-this.jpg;copy-pasting from stackoverflow;2020-10-02;meme,programming,stackoverflow
 ./example/being-complicated.jpg;;2021-02-12;meme,programming
-./example/old-church.jpg;nice church (or something);2019-08-08;house,exif
-./example/park.jpg;nice park;2020-04-05;exif
+https://raw.githubusercontent.com/ianare/exif-samples/master/jpg/gps/DSCN0040.jpg;nice church (or something);2019-08-08;house,exif
+https://raw.githubusercontent.com/ianare/exif-samples/master/jpg/gps/DSCN0021.jpg;nice park;2020-04-05;exif
 ./example/eclipse-intellij.jpg;intellij > eclipse;;meme,programming
 ./example/emacs.jpg;vim > emacs;;meme,programming
 ./example/fixing-in-production.jpg;efficient;2020-06-25;meme,programming
