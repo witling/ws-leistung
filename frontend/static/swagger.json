@@ -1,0 +1,11 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Image Archive",
+        "description": "Upload And Share Your Images. This is the documentation of the frontend service."
+    },
+    "host": "localhost",
+    "basePath": "/docs",
+    "schemes": ["http"],
+    "paths": { }
+}

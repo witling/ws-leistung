@@ -20,6 +20,12 @@ def create_app(config):
 
     database.init_app(app)
 
+    @app.route("/load-spec")
+    def load_spec():
+        from pathlib import Path
+        swagger_json = Path(__file__).parent / "static/swagger.json"
+        return open(swagger_json, "r").read()
+
     app.register_blueprint(api)
 
     return app

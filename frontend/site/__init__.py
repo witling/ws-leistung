@@ -1,10 +1,8 @@
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException 
-from io import BytesIO
-from PIL import Image as PilImage
     
-from model import *
-
+from common.fetch import fetch_backend
+from common.model import *
 
 site = Blueprint('site', __name__)
 
@@ -18,7 +16,6 @@ class JsonPaginator:
             if item["taken_date"]:
                 item["taken_date"] = datetime.strptime(item["taken_date"], '%Y-%m-%d')
 
-            print(item)
             return Image(**item)
 
         self.page = json["page"]
@@ -28,24 +25,6 @@ class JsonPaginator:
 
     def iter_pages(self):
         return (i + 1 for i in range(self._end))
-
-
-def fetch_backend(route, flask_request=None, method='GET'):
-    import requests
-
-    url = f"http://backend:5000{route}"
-
-    current_app.logger.info(f"requesting backend url: {url}")
-
-    if flask_request:
-        res = requests.request(method, url, params=flask_request.args, data=flask_request.form, files=flask_request.files)
-    else:
-        res = requests.request(method, url)
-
-    if res.status_code != 200:
-        raise HTTPException(res.status_code)
-
-    return res
 
 
 @site.route("/")
@@ -62,7 +41,8 @@ def view_upload():
             fetch_backend("/api/image", request, method="POST")
             flash("Image was successfully uploaded!", category="success")
 
-        except:
+        except Exception as e:
+            current_app.logger.error(e)
             flash("We already have this image in our database.", category="error")
 
     return render_template("upload.html")

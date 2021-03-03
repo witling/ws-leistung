@@ -1,0 +1,223 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Image Archive",
+        "description": "Upload And Share Your Images. This is the documentation of the backend service."
+    },
+    "host": "localhost",
+    "basePath": "/docs",
+    "schemes": ["http"],
+    "paths": {
+        "/api/search": {
+            "get": {
+                "summary": "Search the image database using a text query",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 1,
+                        "description": "The text to search for"
+                    },
+                    {
+                        "in": "query",
+                        "name": "filterDateCondition",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["before", "on", "after"]
+                        },
+                        "minimum": 1,
+                        "description": "Condition for the given date"
+                    },
+                    {
+                        "in": "query",
+                        "name": "filterDate",
+                        "type": "string",
+                        "format": "date",
+                        "minimum": 1,
+                        "description": "Optional filter the images taken date"
+                    }
+                ]
+            }
+        },
+
+        "/api/galleries": {
+            "get": {
+                "summary": "Fetch a list of available galleries"
+            }
+        },
+
+        "/api/gallery": {
+            "post": {
+                "summary": "Create a new gallery",
+                "requestBody": {
+                    "description": "Form with the necessary data",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Gallery"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+       "/api/gallery/{galleryId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "galleryId",
+                    "required": true,
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Numeric identifier of the gallery"
+                }
+            ],
+            "put": {
+                "summary": "Update an existing gallery",
+                "requestBody": {
+                    "description": "Form with the necessary data",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Gallery"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an existing gallery"
+            }
+        },
+
+        "/api/gallery/{galleryId}/{imageId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "galleryId",
+                    "required": true,
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Numeric identifier of the gallery"
+                },
+                {
+                    "in": "path",
+                    "name": "imageId",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 1,
+                    "description": "Hash value of the image"
+                }
+            ],
+            "post": {
+                "summary": "Add an image to the gallery"
+            },
+            "delete": {
+                "summary": "Remove an image from the gallery"
+            }
+        },
+
+        "/api/image": {
+            "post": {
+                "summary": "Create a new image",
+                "requestBody": {
+                    "description": "Form with the necessary data",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Image"
+                            },
+                            "examples": {
+                                "image": {
+                                    "summary": "Binary image to upload"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/image/{imageId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "imageId",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 1,
+                    "description": "Hash value of the image"
+                }
+            ],
+            "put": {
+                "summary": "Update an existing image",
+                "requestBody": {
+                    "description": "Form with the necessary data",
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Image"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete an existing image"
+            }
+        }
+    },
+
+    "components": {
+        "schemas": {
+            "Image": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "description": {
+                        "type": "string",
+                        "description": "Short description. This will be searchable."
+                    },
+                    "tags": {
+                        "type": "string",
+                        "description": "Comma separated list of tags for this image."
+                    },
+                    "takenDate": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "The date on which this picute was taken."
+                    }
+                }
+            },
+
+            "Gallery": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "galleryName": {
+                        "type": "string",
+                        "description": "Name of the gallery. This does not need to be unique."
+                    },
+                    "galleryDescription": {
+                        "type": "string",
+                        "description": "Short description of the gallery."
+                    },
+                    "tag": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Images with these tags will be included in the gallery on creation."
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,9 +1,11 @@
 import os
 
+from common.fetch import fetch_backend
 from common.fmt import dateformat
 from common import database
 
 from flask import Blueprint, current_app, flash, Flask, render_template, request
+from flask_swagger_ui import get_swaggerui_blueprint
 
 from .api import api
 from .site import site
@@ -23,6 +25,18 @@ def create_app(config):
 
     database.init_app(app)
 
+    @app.route("/load-spec-frontend")
+    def load_spec_frontend():
+        from pathlib import Path
+        swagger_json = Path(__file__).parent / "static/swagger.json"
+        return open(swagger_json, "r").read()
+
+
+    @app.route("/load-spec-backend")
+    def load_spec_backend():
+        return fetch_backend("/load-spec").json()
+
+
     @app.errorhandler(500)
     def view_500(e):
         return render_template("500.html"), 500
@@ -33,22 +47,28 @@ def create_app(config):
         return render_template("404.html"), 404
 
 
-    @api_proxy.route("/<path:url>", methods=["GET", "POST"])
-    def api_proxy_route(url):
-        from flask import redirect, url_for
-
-        fetch_backend(url, request.method)
-
-        if url.endswith("remove"):
-            return redirect(url_for("site.view_gallery", gallery_id=gallery_id))
-
-        return redirect(url_for("site.view_index"))
-
-
     app.register_blueprint(api)
     app.register_blueprint(site)
 
+    app.register_blueprint(create_swaggerui(config, "frontend"))
+    app.register_blueprint(create_swaggerui(config, "backend"))
+
     return app
+
+
+def create_swaggerui(config, service):
+    from pathlib import Path
+
+    swagger_json = Path(__file__).parent / "static/swagger.json"
+
+    return get_swaggerui_blueprint(
+        f"/docs/{service}",
+        f"http://localhost:4000/load-spec-{service}",
+        blueprint_name = f"swaggerui-{service}",
+        config = {
+            "app_name": "Image archive",
+        }
+    )
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
-from werkzeug.exceptions import HTTPException
 from io import BytesIO
 from PIL import Image as PilImage
+from werkzeug.exceptions import HTTPException
 
-from model import *
+from common.model import *
 
 THUMBNAIL_SIZE = (256, 256)
 EXIF_DATE_CREATED = 36867
@@ -48,6 +48,7 @@ def handle_exception(e):
     db.session.rollback()
     current_app.logger.error(e)
     return {}, 500
+
 
 @api.route("/api/search")
 def api_search():
@@ -176,7 +177,6 @@ def create_gallery(request):
 
     query = Image.query.join(Tag, Tag.image_id == Image.id).options(load_only("id"))
     query = query.filter(Tag.name.in_(tag_names))
-    print(query)
 
     for image in query.all():
         gallery_image = GalleryImage(gallery_id=gallery.id, image_id=image.id)
