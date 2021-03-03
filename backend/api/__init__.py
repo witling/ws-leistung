@@ -54,7 +54,10 @@ def handle_exception(e):
 def api_search():
     from sqlalchemy import or_
 
-    querystring = request.args.get("query", None)
+    querystring = request.args.get("query")
+
+    if not querystring:
+        return {}, 500
 
     filter_date = request.args.get("filterDate", None)
     filter_date_condition = request.args.get("filterDateCondition", None)

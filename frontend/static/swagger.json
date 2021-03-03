@@ -7,5 +7,99 @@
     "host": "localhost",
     "basePath": "/docs",
     "schemes": ["http"],
-    "paths": { }
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Retrieve page overview"
+            }
+        },
+
+        "/upload": {
+            "get": {
+                "summary": "Image upload form"
+            },
+            "post": {
+                "summary": "Upload an image"
+            }
+        },
+
+        "/search": {
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "query",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 1,
+                    "description": "The text to search for"
+                },
+                {
+                    "in": "query",
+                    "name": "filterDateCondition",
+                    "schema": {
+                        "type": "string",
+                        "enum": ["before", "on", "after"]
+                    },
+                    "minimum": 1,
+                    "description": "Condition for the given date"
+                },
+                {
+                    "in": "query",
+                    "name": "filterDate",
+                    "type": "string",
+                    "format": "date",
+                    "minimum": 1,
+                    "description": "Optional filter the images taken date"
+                }
+            ],
+            "get": {
+                "summary": "Search image database"
+            }
+        },
+
+        "/image/{imageId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "imageId",
+                    "type": "string",
+                    "required": true,
+                    "description": "Hash value of the image"
+                }
+            ],
+            "get": {
+                "summary": "Detail view for an image"
+            },
+            "post": {
+                "summary": "Update the images data"
+            }
+        },
+
+        "/galleries": {
+            "get": {
+                "summary": "Overview of galleries"
+            },
+            "post": {
+                "summary": "Create a new gallery"
+            }
+        },
+
+        "/gallery/{galleryId}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "name": "galleryId",
+                    "type": "integer",
+                    "required": true,
+                    "description": "Numeric identifier of the gallery"
+                }
+            ],
+            "get": {
+                "summary": "Detail view for a gallery"
+            },
+            "post": {
+                "summary": "Update the galleries data"
+            }
+        }
+    }
 }

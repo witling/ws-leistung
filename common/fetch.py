@@ -14,6 +14,11 @@ def fetch_backend(route, flask_request=None, method='GET'):
         res = requests.request(method, url)
 
     if res.status_code != 200:
-        raise HTTPException(res.status_code)
+        from werkzeug.exceptions import InternalServerError, NotFound
+
+        if res.status_code == 404:
+            raise NotFound()
+
+        raise InternalServerError()
 
     return res
