@@ -7,4 +7,4 @@ case $1 in
         ;;
 esac
 
-docker-compose up --build --scale app=2
+docker-compose up --build --scale frontend=2

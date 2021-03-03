@@ -3,14 +3,28 @@
 Start
 
 ``` bash
-docker-compose up --scale app=2 --build
+./run.sh
+```
+
+... or ...
+
+``` bash
+docker-compose up --scale frontend=2 --build
 ```
 
 Service will be available at `localhost:4000`.
 
 ## Initial setup
 
+> **Warning:** This will remove all unused docker containers and volumes from your system!
+
 If you are updating the `postgresql` initialization script, make sure to work on a clean volume as the database will not be initialized for non-empty data directories.
+
+``` bash
+./run.sh clean
+```
+
+... or ...
 
 ``` bash
 # make sure the docker-compose system is not running
