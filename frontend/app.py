@@ -66,7 +66,7 @@ def create_swaggerui(config, service):
         f"http://localhost:4000/load-spec-{service}",
         blueprint_name = f"swaggerui-{service}",
         config = {
-            "app_name": "Image archive",
+            "app_name": f"Image archive | {service}",
         }
     )
 
