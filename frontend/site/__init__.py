@@ -35,6 +35,8 @@ def view_index():
 
 @site.route("/upload", methods=["GET", "POST"])
 def view_upload():
+    status_code = 200
+
     # Upload was initiated
     if request.method == "POST":
         try:
@@ -42,10 +44,11 @@ def view_upload():
             flash("Image was successfully uploaded!", category="success")
 
         except Exception as e:
+            status_code = 500
             current_app.logger.error(e)
             flash("We already have this image in our database.", category="error")
 
-    return render_template("upload.html")
+    return render_template("upload.html"), status_code
 
 
 @site.route("/search")
