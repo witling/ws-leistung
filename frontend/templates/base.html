@@ -13,6 +13,17 @@
 
     {% if request.cookies.get("darkmode", None) %}
         <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-dark.min.css') }}"/>
+        <!-- patch background color of inputs -->
+        <style>
+            .form-control,
+            .form-control:focus,
+            .form-control:disabled,
+            .form-select
+            { color: white;background-color: #3c3c3c !important; }
+
+            .form-select
+            { border: none; }
+        </style>
     {% endif %}
 
     {% endblock %}

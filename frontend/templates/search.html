@@ -40,10 +40,10 @@
         </select>
     </div>
     <div class="col-12">
-        <input type="date" name="filterDate" value="{% if date_filter %}{{ date_filter.date }}{% endif %}">
+        <input class="form-control" type="date" name="filterDate" value="{% if date_filter %}{{ date_filter.date }}{% endif %}">
     </div>
     <div class="col-12">
-        <button class="btn btn-outline-primary btn-sm" type="submit">Filter</button>
+        <button class="btn btn-outline-primary" type="submit">Filter</button>
     </div>
 </form>
 
