@@ -1,3 +1,5 @@
+[Docs](./docs/README.md)
+
 # ws-leistung
 
 Start
