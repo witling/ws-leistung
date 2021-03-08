@@ -1,7 +1,6 @@
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from io import BytesIO
 from PIL import Image as PilImage
-from werkzeug.exceptions import HTTPException
 
 from common.model import *
 
@@ -10,6 +9,11 @@ EXIF_DATE_CREATED = 36867
 IMAGES_PER_PAGE = 9
 
 api = Blueprint('api', __name__)
+
+class ApiException(Exception):
+    def __init__(self, msg, status_code=500):
+        self.msg = msg
+        self.status_code = status_code
 
 
 def get_hash_value(img: bytes):
@@ -44,10 +48,19 @@ def parse_tag_names(raw: str):
     return tags
 
 
+@api.errorhandler(Exception)
 def handle_exception(e):
     db.session.rollback()
     current_app.logger.error(e)
-    return {}, 500
+
+    # handle duplicate keys exception
+    if "UniqueViolation" in str(e):
+        return jsonify(message="We already have this image in our database."), 500
+
+    if hasattr(e, "status_code"):
+        return jsonify(message=str(e)), e.status_code
+
+    return jsonify(message=str(e)), 500
 
 
 @api.route("/api/search")
@@ -102,20 +115,16 @@ def api_galleries():
 
 @api.route("/api/gallery/<int:gallery_id>/<string:image_id>", methods=["POST", "DELETE"])
 def api_gallery_image(gallery_id, image_id):
-    try:
-        if request.method == "POST":
-            gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
-            gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
-            gallery.images.append(gallery_image)
+    if request.method == "POST":
+        gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+        gallery_image = GalleryImage(image_id=image_id, gallery_id=gallery_id)
+        gallery.images.append(gallery_image)
 
-        elif request.method == "DELETE":
-            gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
-            db.session.delete(gallery_image)
+    elif request.method == "DELETE":
+        gallery_image = GalleryImage.query.filter_by(image_id=image_id, gallery_id=gallery_id).first_or_404()
+        db.session.delete(gallery_image)
 
-        db.session.commit()
-
-    except Exception as e:
-        return handle_exception(e)
+    db.session.commit()
 
     return {}
 
@@ -123,23 +132,19 @@ def api_gallery_image(gallery_id, image_id):
 @api.route("/api/gallery", methods=["POST"])
 @api.route("/api/gallery/<int:gallery_id>", methods=["PUT", "DELETE"])
 def api_gallery(gallery_id=None):
-    try:
-        if not gallery_id and request.method == "POST":
-            db.session.add(create_gallery(request))
+    if not gallery_id and request.method == "POST":
+        db.session.add(create_gallery(request))
 
-        else:
-            gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
+    else:
+        gallery = Gallery.query.filter_by(id=gallery_id).first_or_404()
 
-            if request.method == "PUT":
-                update_gallery(gallery, request)
+        if request.method == "PUT":
+            update_gallery(gallery, request)
 
-            elif request.method == "DELETE":
-                db.session.delete(gallery)
+        elif request.method == "DELETE":
+            db.session.delete(gallery)
 
-        db.session.commit()
-
-    except Exception as e:
-        return handle_exception(e)
+    db.session.commit()
 
     return {}
 
@@ -147,24 +152,20 @@ def api_gallery(gallery_id=None):
 @api.route("/api/image", methods=["POST"])
 @api.route("/api/image/<string:image_id>", methods=["PUT", "DELETE"])
 def api_image(image_id=None):
-    try:
-        if not image_id and request.method == "POST":
-            db.session.add(create_image(request))
+    if not image_id and request.method == "POST":
+        db.session.add(create_image(request))
 
-        else:
-            image = Image.query.filter_by(id=image_id).first_or_404()
+    else:
+        image = Image.query.filter_by(id=image_id).first_or_404()
 
-            if request.method == "PUT":
-                update_image(image, request)
+        if request.method == "PUT":
+            update_image(image, request)
 
-            elif request.method == "DELETE":
-                db.session.delete(image)
+        elif request.method == "DELETE":
+            db.session.delete(image)
 
-        db.session.commit()
+    db.session.commit()
 
-    except Exception as e:
-        return handle_exception(e)
-    
     return {}
 
 
@@ -198,7 +199,7 @@ def create_image(request):
     raw = uploaded.read()
 
     if not raw:
-        raise Exception("The uploaded file was invalid.")
+        raise ApiException("The uploaded file was invalid.")
 
     image_id = get_hash_value(raw)
 
@@ -207,7 +208,7 @@ def create_image(request):
 
         # Check if uploaded image is jpeg using pillow
         if not is_image_allowed(pil_image):
-            raise Exception("Image does not have the appropriate format. Only jpeg is allowed.")
+            raise ApiException("Image does not have the appropriate format. Only jpeg is allowed.")
 
         
         # If taken date was specified in the form, prefer it over exif data

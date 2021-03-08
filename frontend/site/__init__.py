@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for, jsonify
 from werkzeug.exceptions import HTTPException 
     
 from common.fetch import fetch_backend
@@ -46,7 +46,7 @@ def view_upload():
         except Exception as e:
             status_code = 500
             current_app.logger.error(e)
-            flash("We already have this image in our database.", category="error")
+            flash(e, category="error")
 
     return render_template("upload.html"), status_code
 
