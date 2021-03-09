@@ -9,4 +9,8 @@ WORKDIR /app
 ENV PYTHONPATH=/common
 RUN python -c "import sys; print(sys.path)"
 
+#COPY ./common /common
+#COPY ./frontend /app
+#COPY ./backend /app
+
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

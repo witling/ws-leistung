@@ -172,6 +172,9 @@ def api_image(image_id=None):
 def create_gallery(request):
     from sqlalchemy.orm import load_only
 
+    if not request.form["galleryName"].strip():
+        raise ApiException("No name supplied.")
+
     current_app.logger.info(request.form)
 
     gallery = Gallery()
